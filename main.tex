@@ -1,0 +1,126 @@
+\documentclass[a4paper,12pt]{book}
+\raggedbottom
+\usepackage{subfiles}
+\usepackage{listings}
+
+\makeatletter
+\def\input@path{{./}{../}}
+\makeatother
+
+\input{npsc.tex}  % by little fish (will be the deprecated doc-style)
+\input{ioicamp.tex}  % modifications for ioicamp
+
+\begin{document} 
+
+\newcommand\CurrentPathName{IOICAMP-PATH}
+
+\makeatletter
+\let\tmt@path\lst@inputpath
+\newcommand\tmt@newpath{\CurrentPathName/\tmt@path}
+\renewcommand\lst@inputpath\tmt@newpath
+\makeatother
+
+\makeatletter
+\renewcommand\lst@inputlisting[2][]{
+%\typeout{^^J This is tmt514 message: \lst@inputpath#2, Where [\CurrentPathName]^^J}%
+    \endgroup
+    \def\lst@set{#1}%
+    \IfFileExists{\lst@inputpath#2}%
+        {\expandafter\lst@InputListing{\tmt@path#2}}%
+        {\filename@parse{\lst@inputpath#2}%
+         \edef\reserved@a{\noexpand\lst@MissingFileError
+             {\filename@area\filename@base}%
+             {\ifx\filename@ext\relax tex\else\filename@ext\fi}}%
+         \reserved@a}%
+    \lst@doendpe \@newlistfalse \ignorespaces}
+\makeatother
+
+\makeatletter
+\let\latex@input\input
+\newcommand\red@input[1]{%
+  \latex@input{\CurrentPathName/#1}%
+}
+%\AtBeginDocument{\let\input\red@input}
+\renewcommand{\input}{\expandafter\red@input}
+
+\let\latex@part\part
+\newcommand\red@part[1]{%
+\setcounter{chapter}{0}%
+\latex@part{#1}%
+}
+\renewcommand\part\red@part
+\makeatother
+
+% 目錄
+\renewcommand{\ChapterChinese}{目錄} %取代原先的 \NewChapter
+\renewcommand{\ChapterEnglish}{Contents} %取代原先的 \NewChapter
+%\tableofcontents
+\clearpage
+
+% 手冊序、活動日程與內容
+%\part{集訓須知}
+%\renewcommand{\chaptername}{Episode}
+
+%\renewcommand{\CurrentPathName}{contents-ioicamp}
+%\subfile{dates}
+%\subfile{classroom}
+
+% 正式課程(依照日期序)
+\renewcommand{\ChapterImageParameter}{\includegraphics*{template/c.png}}
+%\part{課程講義}
+%\renewcommand{\chaptername}{Lecture}
+
+%\renewcommand{\CurrentPathName}{lecture-fcrh-special}
+%\subfile{analysis}
+
+%\renewcommand{\CurrentPathName}{lecture-dp}
+%\subfile{dp}
+
+%\renewcommand{\CurrentPathName}{lecture-number-theory}
+%\subfile{number-theory}
+
+%\renewcommand{\CurrentPathName}{lecture-data-structure-basic}
+%\subfile{data-structure-basic}
+
+%\renewcommand{\CurrentPathName}{lecture-data-structure-advanced}
+%\subfile{ds-adv}
+
+%\renewcommand{\CurrentPathName}{lecture-graph-theory-basic}
+%\subfile{graph-theory-basic}
+
+%\renewcommand{\CurrentPathName}{lecture-graph-theory-advanced}
+%\subfile{graph-theory-advanced}
+
+%\renewcommand{\CurrentPathName}{lecture-counting-and-probability}
+%\subfile{counting-and-probability}
+
+%\renewcommand{\CurrentPathName}{lecture-geometry}
+%\subfile{geometry}
+
+\renewcommand{\CurrentPathName}{lecture-string}
+\subfile{string}
+
+%\renewcommand{\CurrentPathName}{lecture-square-root-method}
+%\subfile{square-root-method}
+
+% 補充教材(特別篇與自行閱讀資料等)
+% \renewcommand{\ChapterImageParameter}{\includegraphics*{template/a.png}}
+% \part{特別篇與延伸閱讀}
+% \renewcommand{\chaptername}{Topic}
+% 
+% \renewcommand{\CurrentPathName}{topic-tmt}
+% \subfile{enumeration}
+% \subfile{number-theory}
+%\subfile{induction}
+
+
+\renewcommand{\chaptermark}{}
+%\renewcommand{\CurrentPathName}{contents-ioicamp}
+% 工作人員、致謝
+%\subfile{staff}
+
+% 贊助頁面
+
+\newpage
+
+\end{document}

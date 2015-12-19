@@ -1,0 +1,479 @@
+% XeTeX template for IOIcamp printables
+
+% 設定英文字型，不設的話就會使用預設的字型
+%\setmainfont[BoldFont=Helvetica]{Times New Roman}  % Changed by Skyly (01/09)
+\newfontfamily{\couriernew}{Source Code Pro}
+\newfontfamily{\helvetica}{TeX Gyre Adventor}
+\newfontfamily{\helveticalight}[BoldFont=TeX Gyre Adventor]{TeX Gyre Adventor}
+\newCJKfontfamily{\LiHeiPro}{cwTeX Q Ming}
+%\newfontfamily{\Garamond}{Garamond}
+\newCJKfontfamily{\Kai}{cwTeX Q Kai}
+\newCJKfontfamily{\BookHead}{cwTeX Q Hei}
+\DeclareMathVersion{mymath}
+\DeclareSymbolFont {myoperators}{OT1}{ccr}{m}{n}
+\SetSymbolFont{operators}{mymath}{OT1}{ccr}{m}{n}
+\DeclareSymbolFont{myletters}{OML}{ccm}{m}{it}
+\SetSymbolFont{letters}{mymath}{OML}{ccm}{m}{it}
+\DeclareSymbolFont{mysymbols}{OMS}{ccsy}{m}{n}
+\SetSymbolFont{symbols}{mymath}{OMS}{ccsy}{m}{n}
+\DeclareSymbolFont{mylargesymbols}{OMX}{ccex}{m}{n}
+\SetSymbolFont{largesymbols}{mymath}{OMX}{ccex}{m}{n}
+\SetMathAlphabet\mathbf{mymath}{OT1}{ccr}{bx}{n}
+\SetMathAlphabet\mathit{mymath}{OT1}{ccr}{m}{it}
+
+% 中文自動換行
+\XeTeXlinebreaklocale "zh"
+% 文字的彈性間距
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+% 段距
+\setlength{\parskip}{1em}
+% 行距
+\linespread{1.2}\selectfont
+% 不縮排
+\setlength{\parindent}{0pt}
+
+% Wildcard-tmt Title Font (WTF)
+\newcommand{\tmtTitleFont}{\bfseries\helveticalight\LiHeiPro}
+
+% 頁首、頁尾
+\usepackage{fancyhdr}
+\usepackage{calc}
+\usepackage[explicit]{titlesec}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{pbox}
+\pagestyle{fancy}
+\setlength{\headheight}{15pt}
+%\fancyheadoffset[LE,RO]{\marginparsep+\marginparwidth}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{String}}
+\renewcommand{\headrulewidth}{0pt} % and the line
+\fancyhf{}
+\fancyhead[LE]{\hspace*{-21pt}{\tmtTitleFont\thepage\ \ \ }\begin{tikzpicture}[remember picture, overlay]\fill[fill=black](0,-3pt)rectangle(3pt,0.8\baselineskip);\end{tikzpicture}}
+\fancyhead[RO]{\begin{tikzpicture}[remember picture, overlay]\fill[fill=black](0,-3pt)rectangle(3pt,0.8\baselineskip);\end{tikzpicture}\tmtTitleFont{\ \ \ \thepage}}
+\fancyhead[LO]{\hspace*{-21pt}{\tmtTitleFont\BookHead\rightmark}}
+\fancyhead[RE]{{\tmtTitleFont\BookHead\leftmark}}
+\fancypagestyle{plain}{%
+\fancyhead{} % get rid of headers
+\renewcommand{\headrulewidth}{0pt} % and the line
+}
+
+
+%%%%
+
+\lstset{
+	language=C++,
+%basicstyle=\footnotesize\ttfamily\fontfamily{pcr}\selectfont,
+%commentstyle=\footnotesize\ttfamily\fontfamily{pcr}\selectfont,
+	columns=flexible,	
+	basewidth=0.6em,
+    %commentstyle=\footnotesize\Couriernew,
+	basicstyle=\footnotesize\couriernew,
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+	stepnumber=1,
+	showspaces=false,               % show spaces adding particular underscores
+	showstringspaces=false, 
+	tabsize=2,
+	frame=single,
+	extendedchars=true,
+	breaklines=true,
+	inputencoding=utf8x
+  commentstyle=\color{blue}
+}
+
+% 修改 Title Formats
+\usetikzlibrary{calc}
+
+\newcommand{\ChapterEnglish}{}
+\newcommand{\ChapterChinese}{}
+\renewcommand{\chaptername}{Lecture}
+%%
+%% Create Chapter Image
+%%
+\newcommand{\ChapterImageParameter}{\includegraphics*{template/c.png}}
+\titleformat{\chapter}[display]
+{\gdef\chapterlabel{}\Huge\bfseries\helvetica}{\gdef\chapterlabel{\chaptertitlename\ \thechapter}}{0pt}{
+\begin{tikzpicture}[remember picture, overlay]%
+%%
+%% The Lower Rectangle
+%%
+\fill[fill=black!90!white] (-10pt,-6pt) rectangle (\paperwidth, {3cm-6pt});%
+%%
+%% The Upper Rectangle
+%%
+\fill[fill=black!70!white] (-26pt,0) rectangle (\paperwidth, 3cm);%
+%%
+%% Right Image
+%%
+\node[anchor=south east,xshift=2.5cm,yshift=-8pt] at (\textwidth,0) {\ChapterImageParameter};%
+\fill[fill=black!70!white,opacity=.6] (-26pt,0) rectangle (\paperwidth, 3cm);%
+%%
+%% Chapter Label
+%%
+\node[anchor=west,yshift=60pt,xshift=-16pt] {\color{white}\chapterlabel};%
+%%
+%% Chinese Title
+%%
+\node(ChineseTitle)[anchor=west,xshift=12pt,yshift={\baselineskip-8pt}] {\color{white}\ChapterChinese};%
+%%
+%% Middle Bar
+%%
+\node(MidBar)[minimum height=26pt,outer sep=0,inner sep=0,fill=black!10!white,xshift=4pt] at (ChineseTitle.east) {\color{black!10!white}\,};%
+%%
+%% English Title
+%%
+\node(EnglishTitle)
+[anchor=west,yshift=-4pt] at (MidBar.east) {\color[rgb]{0.9,0.9,0.9}{\Large{\ChapterEnglish}}};%
+\end{tikzpicture}%
+}
+
+\titlespacing*{\chapter}{0pt}{60pt}{40pt}
+
+\titleformat{\section}[display]
+{\gdef\sectionlabel{}\normalfont\Large\bfseries\helvetica}{\gdef\sectionlabel{\thesection}}{1em}{\begin{tikzpicture}[remember picture, overlay]%
+\node (SecSymb) [anchor=south west,yshift={8pt-2pt},xshift={-21pt+2pt},fill=black!90!white] {\color{black!90!white}\sectionlabel};%
+\node (SecSymb) [anchor=south west,yshift=8pt,xshift=-21pt,fill=black!70!white] {\color{white}\sectionlabel};%
+\node[anchor=west,xshift=4pt,yshift=-1pt] at (SecSymb.east) {#1};%
+\end{tikzpicture}}
+
+\titlespacing*{\section}{0pt}{-20pt}{0pt}
+
+
+\providecommand\NewChapter[2]{
+	\renewcommand{\ChapterEnglish}{#2}
+	\renewcommand{\ChapterChinese}{#1}
+	\chapter{#1}
+}
+
+
+\usepackage[framemethod=TikZ]{mdframed}
+\newcounter{exple}[chapter]
+\makeatletter
+\newcommand{\theexample}{\helvetica{例題~\arabic{chapter}-\arabic{exple}}}
+\def\mdf@@sampletitle{}
+\define@key{mdf}{title}{%
+	\def\mdf@@sampletitle{#1}
+}
+\def\mdf@@samplesource{}
+\define@key{mdf}{source}{%
+	\def\mdf@@samplesource{#1}
+}
+\tikzset{tikzprobL/.style={fill=black!20,rectangle,minimum height=1.2\baselineskip}}
+\tikzset{tikzborder/.style={ultra thick,color=black!50}}
+\mdfdefinestyle{sampleproblem}{%
+	outermargin=+12pt,
+	innermargin=+12pt,
+	innerleftmargin=24pt,
+	innerrightmargin=16pt,
+	innerbottommargin=8pt,
+	innertopmargin=30pt,
+	splittopskip=16pt,
+	splitbottomskip=8pt,
+	skipabove=16pt,
+	leftline=false,
+	rightline=false,
+	topline=false,
+	bottomline=false,
+	frametitlefont=\tmtTitleFont,
+	settings={\global\stepcounter{exple}},
+	singleextra={%
+		\node(SampleMark)[tikzprobL,anchor=north west] at (P-|O) {~\mdf@frametitlefont{\theexample}\hbox{~}};%
+		\node(Topo)[minimum height={1.2\baselineskip},anchor=west] at (SampleMark.east) {\mdf@frametitlefont\mdf@@sampletitle};%
+		\node(Sourcer) [minimum height={1.2\baselineskip},anchor=north east,yshift=-4pt] at (P) {\footnotesize\mdf@frametitlefont\mdf@@samplesource};%
+		\path let
+				\p1 = (Sourcer.south west),
+				\p2 = (SampleMark.south east),
+				\p3 = (Sourcer.north west)
+			in
+				coordinate (c1) at ($(\x1,\y2)+(-1.8\baselineskip ,0)$)
+				coordinate (c2) at ($(\p3)+(-0.6\baselineskip, 0)$);%
+		\draw[ultra thick,color=black!50] (SampleMark.south west) -- (c1) -- (c2) -- (Sourcer.north east);%
+		\draw[ultra thick,color=black!50] (O) -- (O-|P);%
+	},
+	firstextra={\node(SampleMark)[tikzprobL,anchor=north west] at (P-|O)%
+		{~\mdf@frametitlefont{\theexample}\hbox{~}};%
+		\node(Topo)[minimum height={1.2\baselineskip},anchor=west] at (SampleMark.east) {\mdf@frametitlefont\mdf@@sampletitle};%
+		\node(Sourcer) [minimum height={1.2\baselineskip},anchor=north east,yshift=-4pt] at (P) {\footnotesize\mdf@frametitlefont\mdf@@samplesource};%
+		\path
+			let
+				\p1 = (Sourcer.south west),
+				\p2 = (SampleMark.south east),
+				\p3 = (Sourcer.north west)
+			in
+				coordinate (c1) at ($(\x1,\y2)+(-1.8\baselineskip ,0)$)
+				coordinate (c2) at ($(\p3)+(-0.6\baselineskip, 0)$);
+		\draw[tikzborder] (SampleMark.south west) -- (c1) -- (c2) -- (Sourcer.north east);%
+		\draw[tikzborder] (O) -- (O-|P);%
+		\node[xshift=-5pt, yshift=2pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt,rotate=180] at (O-|P) {};%
+	},
+	middleextra={
+		\draw[tikzborder] (P) -- (P-|O);
+		\node[xshift=-5pt, yshift=-4pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt] at (P) {};
+		\draw[tikzborder] (O) -- (O-|P);
+		\node[xshift=-5pt, yshift=2pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt,rotate=180] at (O-|P) {};
+	},
+	secondextra={
+		\draw[tikzborder] (P) -- (P-|O);
+		\node[xshift=-5pt, yshift=-4pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt] at (P) {};
+		\draw[tikzborder] (O) -- (O-|P);
+	},
+	font={\Kai\mathversion{mymath}},
+}
+\makeatother
+\providecommand\SampleProblem[3][經典問題]{
+\begin{mdframed}[style=sampleproblem,title=#2,source=#1]%
+%
+#3%
+\end{mdframed}
+}
+
+% kelvin added this part:
+% He think the original form does not separate the sample problem itself well
+% with following contents, and would like at least some simple line / box / vskip
+% that distinguishes the sample problem from other content.
+% It's ugly now, I know. Anyone is also welcomed to beautify this temporary setting.
+%\providecommand\ExplainedSampleProblem[2]{
+%
+%\noindent\hrulefill
+%
+%{
+%\leftskip 1em
+%\rightskip 1em
+%\noindent\textbf{(例題 x) {#1}}
+%	
+%	{#2}
+%}
+%
+%\vspace{-0.5em}
+%\noindent\hrulefill
+%
+%}
+
+\newcounter{exeprob}[chapter]
+\renewcommand{\theexeprob}{\helvetica{習題~\arabic{chapter}-\arabic{exeprob}}}
+\providecommand\ExerciseProblem[2][經典問題]{%
+\stepcounter{exeprob}%
+\begin{tikzpicture}%
+\fill[fill=black!10] (0,0) rectangle (\textwidth,-\baselineskip);%
+\node(ProbNum)[anchor=north west] at (0,0) {\bfseries\helvetica\theexeprob};%
+\path let \p1=(ProbNum.east) in coordinate (City) at ($(\x1,-\baselineskip)$);%
+\fill[fill=black!30] (0,0) rectangle (City);%
+\node(ProbNum)[anchor=north west] at (0,0) {\bfseries\helvetica\theexeprob};%
+\node(PSource)[anchor=north east] at (\textwidth,0) {\footnotesize\bfseries\helvetica{#1}};%
+\path
+	let
+		\p1 = (PSource.north west),
+		\p2 = (\textwidth,-\baselineskip)
+	in
+		coordinate (c1) at ($(\x1-\baselineskip,\y2)$)
+		coordinate (c2) at ($(\p1)$)
+		coordinate (c3) at ($(\x2,0)$)
+		coordinate (c4) at ($(\p2)$);%
+\fill[fill=black!20] (c1) -- (c2) -- (c3) -- (c4) -- cycle;%
+\node(PSource)[anchor=north east] at (\textwidth,0) {\footnotesize\tmtTitleFont{#1}};%
+\node[anchor=west] at (ProbNum.east) {\tmtTitleFont{#2}};%
+\end{tikzpicture}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Pseudocode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage[boxed,commentsnumbered]{algorithm2e}
+\usepackage[noline, linesnumbered, commentsnumbered, algoruled, titlenotnumbered]{algorithm2e}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sample Code Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[misc]{ifsym}
+\newcounter{codepiece}[chapter]
+\newcommand{\thecodepiecep}{\helvetica{程式碼片段~\arabic{chapter}-\arabic{codepiece}}}
+\tikzset{tikzCodeBanner/.style={fill=black!10,rectangle,minimum height=\baselineskip}}
+\tikzset{tikzCodeBorder/.style={line width=1.2pt,color=black!30}}
+\makeatletter
+\mdfdefinestyle{mdfsamplecode}{%
+	outermargin=+12pt,
+	innermargin=+12pt,
+	innerleftmargin=12pt,
+	innerrightmargin=0pt,
+	innerbottommargin=-8pt,
+	innertopmargin=\baselineskip,
+	splittopskip=12pt,
+	splitbottomskip=2pt,
+	skipabove=16pt,
+	leftline=false,
+	rightline=false,
+	topline=false,
+	bottomline=false,
+	settings={\stepcounter{codepiece}},
+	singleextra={%
+		%% Define Positions
+		\node(NumberPart)[anchor=north east] at (P) {\footnotesize\bfseries\thecodepiecep};
+		\node(CaptionPart)[anchor=north west] at (P-|O) {\small\tmtTitleFont\mdf@@sampletitle};
+		%% Draw Background
+		\fill[fill=black!10] (CaptionPart.south west) rectangle (NumberPart.north east); 
+		%% Draw Text
+		\node(NumberPart)[anchor=north east] at (P) {\footnotesize\bfseries\thecodepiecep};
+		\node(CaptionPart)[anchor=north west] at (P-|O) {\small\tmtTitleFont\mdf@@sampletitle};
+		%% The bottom line
+		\draw[tikzCodeBorder] (O) -- (O-|P);
+	},
+	firstextra={
+		%% Define Positions
+		\node(NumberPart)[anchor=north east] at (P) {\footnotesize\bfseries\thecodepiecep};
+		\node(CaptionPart)[anchor=north west] at (P-|O) {\small\tmtTitleFont\mdf@@sampletitle};
+		%% Draw Background
+		\fill[fill=black!10] (CaptionPart.south west) rectangle (NumberPart.north east); 
+		%% Draw Text
+		\node(NumberPart)[anchor=north east] at (P) {\footnotesize\bfseries\thecodepiecep};
+		\node(CaptionPart)[anchor=north west] at (P-|O) {\small\tmtTitleFont\mdf@@sampletitle};
+		\draw[tikzCodeBorder] (O) -- (O-|P);
+		\node[xshift=-5pt, yshift=2pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt,rotate=180] at (O-|P) {};
+	},
+	middleextra={
+		\draw[tikzCodeBorder] (P) -- (P-|O);
+		\node[xshift=-5pt, yshift=-4pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt] at (P) {};
+		\draw[tikzCodeBorder] (O) -- (O-|P);
+		\node[xshift=-5pt, yshift=2pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt,rotate=180] at (O-|P) {};
+	},
+	secondextra={
+		\draw[tikzCodeBorder] (P) -- (P-|O);
+		\node[xshift=-5pt, yshift=-4pt, anchor=north,regular polygon, fill=black, regular polygon sides=3, inner sep=2pt] at (P) {};
+		\draw[tikzCodeBorder] (O) -- (O-|P);
+	}
+	%font={\Kai\mathversion{mymath}}
+}
+\makeatother
+
+
+
+
+\providecommand\InlineCode\lstinline
+
+
+\lstdefinestyle{ioicamp}{
+	%numberstyle=\footnotesize\Garamond,
+	numberstyle=\scriptsize\textifsym,
+	frameshape={NNNNNNNNN}{nyn}{nnn}{NNNNNNNNN},
+	framerule=1.2pt,
+	rulecolor=\color[rgb]{0.7,0.7,0.7},
+	belowskip=0pt
+}
+\lstset{style=ioicamp}
+
+\providecommand\SourceCode[4][Default Caption]{
+\begin{mdframed}[style=mdfsamplecode,title=#1,source=#2]%
+\lstinputlisting[language=C++, firstline=#3, lastline=#4, firstnumber=1]{ref-codes/#2}\end{mdframed}
+}
+
+%%%
+%%%     Figure
+%%%
+\usepackage{caption}
+
+\makeatletter
+\newcommand{\@InsertFigureWithFigure}[3]{
+\begin{figure}[h]
+\captionsetup{width=0.8\textwidth}
+\centering
+% hack by Darkpi
+\ifdefined \CurrentPathName
+\includegraphics[width={#2}]{\CurrentPathName/figures/#1}
+\else
+\includegraphics[width={#2}]{figures/#1}
+\fi
+\ifx&#3&
+\else
+\caption{#3}
+\fi
+\end{figure}
+}
+\newlength{\myskipwidth}
+\newlength{\mypicwidth}
+\newcommand{\@InsertFigureWithoutFigure}[3]{
+\ifdefined \CurrentPathName
+{%
+\setlength{\mypicwidth}{#2}%
+\setlength{\myskipwidth}{-0.5\mypicwidth}%
+\addtolength{\myskipwidth}{0.5\textwidth}%
+\addtolength{\myskipwidth}{-8pt}%
+\hspace*{\myskipwidth}%
+\includegraphics[width={#2}]{\CurrentPathName/figures/#1}}
+\else
+\setlength{\mypicwidth}{#2}%
+\setlength{\myskipwidth}{-0.5\mypicwidth}%
+\addtolength{\myskipwidth}{0.5\textwidth}%
+\addtolength{\myskipwidth}{-8pt}%
+\hspace*{\myskipwidth}%
+\includegraphics[width={#2}]{figures/#1}%
+\fi
+}
+
+
+\def\@myenvname{mdframed}
+\providecommand\Figure[3]{%
+\typeout{CURRENTVIR = [\@currenvir]\@myenvname}
+\ifx\@currenvir\@myenvname
+\expandafter\@InsertFigureWithoutFigure{#1}{#2}{#3}
+\else
+\expandafter\@InsertFigureWithFigure{#1}{#2}{#3}
+\fi
+}
+\makeatother
+
+\usepackage{array}
+%\usepackage{amsthm}
+\usepackage{ntheorem}
+\usepackage{mathdots}
+
+\makeatletter
+\newtheoremstyle{customthm}
+{\item[\hskip\labelsep \theorem@headerfont\helvetica 定理\theorem@separator]}% no optional argument
+  {\item[\hskip\labelsep \theorem@headerfont\helvetica ##3：\theorem@separator]}% optional argument
+\makeatother
+\theoremstyle{customthm}
+
+\theoremheaderfont{\normalfont\bfseries}
+\theorembodyfont{\normalfont\Kai}
+\newmdtheoremenv[%
+	outerlinewidth=1.2pt,%
+	leftmargin=40pt,%
+	rightmargin=40pt,%
+	backgroundcolor=black!5,%
+	outerlinecolor=black!60,%
+	ntheorem=true,%
+	font=\Kai\mathversion{mymath},%
+]{theorem}{}[chapter]
+
+
+%%%
+%%%		Table Of Contents
+%%%
+%\usepackage{tocloft}
+\usepackage{setspace}
+\setcounter{tocdepth}{2}
+\addtocontents{toc}{\protect\setstretch{0.7}}
+%\setlength\cftparskip{0pt}
+%\setlength\cftbeforechapskip{12pt}
+
+
+%%%
+%%%    皮皮的stuff (從game-section-5搬過來)
+%%%
+\usetikzlibrary{arrows}
+\providecommand\DrawTree[1]{
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 0.7cm, level distance = 0.8cm},treenode/.style = {inner sep=0pt},arn_b/.style = {treenode, circle, white, draw=black, fill=black, text width=1.2em},arn_w/.style = {treenode, circle, white, draw=black, text width=1.2em}]
+#1
+\end{tikzpicture}
+}
+
+%%%
+%%%    江誠敏的stuff
+%%%
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{automata}
+
+\usepackage{wasysym} % add by seanwu

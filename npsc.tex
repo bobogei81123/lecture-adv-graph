@@ -1,0 +1,161 @@
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX Template
+%   Golbal Settings for NPSC
+%
+% Author:
+%   MengHuan Yu     cebrusfs@gmail.com
+%                                                            2013 / 10 / 28
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% ------------------------------------------------------------------------------
+%	邊界
+% ------------------------------------------------------------------------------
+\usepackage[includeheadfoot, headsep=0.3in,left=1.2in, right=1in, vmargin=0.5in]{geometry}
+% seanwu: 調大了一點邊界，不然裝訂邊要跑出去了
+
+\linespread{1.1} % 行距
+
+% ------------------------------------------------------------------------------
+%	數學
+% ------------------------------------------------------------------------------
+\usepackage{mathtools}
+\usepackage{amssymb}
+
+\DeclareMathOperator{\Span}{span}        % span symbol
+\DeclareMathOperator{\Tr}{tr}            % trace symbol
+
+% ++ symbol in haskell
+\newcommand\doubleplus{+\kern-1.3ex+}
+
+
+% ------------------------------------------------------------------------------
+%	程式碼
+% ------------------------------------------------------------------------------
+\usepackage[usenames, dvipsnames]{xcolor} % Required for custom colors
+\usepackage{listings}
+
+\lstdefinestyle{npsc}{%
+    language        = {c++},
+    % Font Setting
+    basicstyle      = {\linespread{1.0}\ttfamily}, 
+    %identifierstyle = {\color{black}},
+    %commentstyle    = {\color{olive}},
+    %keywordstyle    = {\color{blue}\bfseries},
+    %stringstyle     = {\color{purple}},
+    %directivestyle  = {\color{brown}},
+    keywordstyle    = {\bfseries},
+    commentstyle    = ,
+    % Single frame around code
+    frame           = {single},
+    % Align Setting
+    xleftmargin     = {2em},
+    xrightmargin    = {2em},
+    % Line number Setting 
+    numberstyle     = {\tiny}, % Line numbers are blue and small
+    numbers         = {left}, % Line numbers on left
+    firstnumber     = {1}, % Line numbers start with line 1
+    stepnumber      = {1}, % Line numbers go in steps of 1
+    % Auto break line if code is too long
+    breaklines      = {true},
+    breakautoindent = {true},
+    % Other
+    showstringspaces= {false}, % Don't put marks in string spaces
+    tabsize         = {4}, % 4 spaces per tab
+    escapeinside    = {{/*}{*/}}, % can use for Chinese
+    extendedchars   = {false},
+    morecomment     = {[l][]{...}}, % Line continuation (...) is comment
+}
+\lstset{style=npsc}
+
+% usage: \insertcode{language}{code path}{label}
+%   ex. \insertcode{C++}{hw2_3_3.cpp}{Algorithm of 2-3}
+\newcommand{\insertcode}[3]
+{%
+    \begin{itemize}
+        \item[]\lstinputlisting[language=#1,caption=#3,label=#2]{#2}
+    \end{itemize}
+}
+
+
+% ------------------------------------------------------------------------------
+%	虛擬碼
+% ------------------------------------------------------------------------------
+%\usepackage[lined, boxed, commentsnumbered, ruled]{algorithm2e}
+
+
+% ------------------------------------------------------------------------------
+%	圖片
+% ------------------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+%includegraphics[height=高度, width=寬度, angle=旋轉角, scale=縮放倍數]%{檔名}
+
+%\begin{figure}[here]
+    %\centering 
+    %\setlength{\fboxrule}{0.5pt}
+    %\setlength{\fboxsep}{0.3cm}
+    %\fbox{\includegraphics[scale=1.0]{./1.png}}
+    %\caption{comment}
+%\end{figure}
+
+% ------------------------------------------------------------------------------
+%	xeCJK
+% ------------------------------------------------------------------------------
+\usepackage{indentfirst} % 中文第一段縮排套件
+%\usepackage{txfonts}
+%\usepackage{lmodern}        % The Latin Modern fonts are enhanced versions 
+                            % of the Computer Modern fonts
+%\usepackage[T1]{fontenc}    % 字型編碼
+%\usepackage{courier}        % Courier New 修正
+\usepackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}
+\usepackage[SlantFont]{xeCJK}
+%\usepackage[BoldFont, SlantFont]{xeCJK}
+
+
+\setCJKmainfont[BoldFont=cwTeX Q Hei]{cwTeX Q Ming} % 設定主字體
+\setCJKmonofont{cwTeX Q Ming} % 設定等寬字體
+ \setmonofont{Source Code Pro}
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+
+% ------------------------------------------------------------------------------
+%	繪圖
+% ------------------------------------------------------------------------------
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+
+
+% ------------------------------------------------------------------------------
+%	雜七雜八
+% ------------------------------------------------------------------------------
+\usepackage[shortlabels]{enumitem}
+\usepackage{multicol}        %多欄位
+\usepackage{comment}         %latex註解插件
+%\hbadness=10000			 %美學容忍度設定
+
+% kelvin changed this..
+% Just set noitemsep, and the orginal top/bottom space is horrible...
+%縮小 itemize 的間距
+%\let\olditemize=\itemize
+%\def\itemize{
+%	\olditemize
+%	\setlength{\itemsep}{-1ex}
+%}
+\setlist[itemize]{noitemsep, topsep=0pt}
+\setlist[enumerate]{noitemsep, topsep=0pt}
+
+% ------------------------------------------------------------------------------
+%	header/footer
+% ------------------------------------------------------------------------------
+\usepackage{fancyhdr}
+%\usepackage{lastpage}        %讀取總頁數
+
+
+% ------------------------------------------------------------------------------
+%	End of Header
+% ------------------------------------------------------------------------------
