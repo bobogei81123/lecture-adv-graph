@@ -2,6 +2,9 @@
 \documentclass[a4paper,12pt]{book}
 \input{npsc.tex}  % by little fish (will be the deprecated doc-style)
 \input{ioicamp.tex}  % modifications for ioicamp
+\usepackage{caption}
+\DeclareCaptionLabelFormat{cfig}{圖#2}
+\captionsetup{labelformat=cfig}
 
 
 \begin{document}
@@ -81,16 +84,34 @@
 \begin{enumerate}[label=(1.\arabic*) :]
   \item 每條邊的流量都沒有超過他的限制。
   \item 如果 $u$ 往 $v$ 流 $c$ 單位就相當於 $v$ 往 $u$ 流 $-c$ 單位。
-  \item 流不能無中生有！ 每一點進去的流量要等於出去的流量，也就是
+  \item 流不能無中生有！ 每一點除了 $s, t$ 以外進去的流量要等於出去的流量，也就是
     淨流量必須是 $0$ 。
 \end{enumerate}
 
-舉個例子，如果$\Sigma = \{\texttt{"A"}, \texttt{"C"}, \texttt{"G"}, \texttt{"T"}\}$，$A$可能表示你的DNA序列，或者如果$\Sigma = \{\texttt{"0"}, \texttt{"1"}, \cdots \texttt{"9"}\}$，那麼$A$可能代表客戶的電話號碼。這時候就會有許多有趣的問題了，比如：
-\begin{itemize}
-  \item 假設另一段DNA字串$B$代表一個可能的致癌基因，如何快速的判斷一個人是否帶有這種基因？
-  \item 現在有幾種不同的生物的DNA序列，如何判斷這些字串間的相似成度，以了解演化順序？
-\end{itemize}
-對於這些問題，數據的大小可以是非常大的，我們勢必會需要一些好的演算法來解決它們！不過在這之前我們必需先說清楚一些定義。
+
+\tikzset{vertex/.style={circle, draw, thick, minimum size=.8cm}}
+\tikzset{source/.style={vertex, fill=black!20}}
+\tikzset{fed/.style={draw, -latex, thick}}
+\tikzset{%
+  apply style/.code={%
+    \tikzset{#1}%
+  }
+}
+\begin{figure}[H]
+  \centering
+  \input{tikz/flow1.tex}
+  \caption{一個流量網路的例子}
+  \label{fig:flow1}
+\end{figure}
+
+如圖~\ref{fig:flow1} 就是一個流量網路的例子，而右圖則是他的一組解。
+讀者可以驗證這個解的確滿足 s-t 可行流的三個限制。
+
+而通常我們會希望流量 $\abs{f}$ 可以越大越好， $\abs{f}$ 最大的
+s-t 可行流就稱作{\bf 最大流}。
+
+\section{最大流演算法}
+我們定義了最大流後，現在的問題是要如何找出一個最大流以及他的流量呢？
 
 \begin{theorem}[定義]
   給定一個字串$A = a_0 a_1 \cdots a_{n-1}$
@@ -146,7 +167,6 @@ Trie的道理非常簡單，其實就是用一棵樹來儲存字串。在這棵�
 \SampleProblem[Everywhere]{String Matching}{ 給你兩個字串 $A$, $B$ 找出所有 $B$ 出現在 $A$ 中的位置。}
 
 而一般大家最先想到的做法通常是…就把所有的位置試過一遍！ 
-\SourceCode[naive-matching]{naive-matching.cpp}{1}{9999}
 
 這樣寫好不好呢？其實可以證明這樣的{\bf 期望複雜度}是$\ord{\abs{A}}$。可惜的是，最差的情況可以到$\ord{\abs{A}\abs{B}}$！更糟的是很容易構造出例子，如$A = \mcstr{AAAAA}{AA}, B = \mcstr{AAA}{B}$，這樣雖然$B$從來沒有出現在$A$中，但是每個位置我們都必需匹配到$B$的最後一個字元才能確定匹配失敗！
 那要怎麼改進這個演算法呢？著手點有兩個：
@@ -330,7 +350,6 @@ $\fail(i), \forall 0 \leq i \leq n$，現在要求$\fail(n+1)$，根據定義相
 這不恰恰是我們現在的情況嗎？因此由 $\fail(j) = \fail(\fail(n))$ ，我們便把當前位置($n$)對齊 $B[\fail(\fail(n))]$。也就是下一個要試的$k'$是$\fail(\fail(n))$！如果又失敗，我們便再試$\fail^3(n), \fail^4(n) \cdots$，直到終於成功或是確認沒有$k$存在($\fail(n+1) = -1$)。這正是失敗函數的精髓！他告訴我們一旦失敗該何去何從。\\
 這邊附上一個KMP的範例程式碼，並總結一下KMP的性質。
 
-\SourceCode[kmp]{kmp.cc}{4}{31}
 
 \begin{theorem}[定理]
   對於一個字串$B$，有
@@ -382,7 +401,6 @@ $\fail(i), \forall 0 \leq i \leq n$，現在要求$\fail(n+1)$，根據定義相
   u = \flk(v) \quad \Rightarrow \quad \abs{S_T(u)} < \abs{S_T(v)}
 \]
 因此我們可以以BFS的順序，逐一建出這個表！
-\SourceCode[AC automata]{ACautomata.cpp}{1}{9999}
 與KMP相似，匹配時若失敗便往$\flk(v)$走，直到走到根節點或是終於匹配成功為止。
 
 \section{Z Algorithm}
@@ -544,7 +562,6 @@ $\fail(i), \forall 0 \leq i \leq n$，現在要求$\fail(n+1)$，根據定義相
 
 仔細分析了之後我們可以知道，除非是第3種Case才需要計算。假設計算 $Z(j)$ 時用到了第3種Case，我們就把 $(L, R)$ 更新為 $(j, j+Z(j)-1)$，可以發現如這樣做$R$值只會一直增加，且增加次數不可能超過字串的長度，並且匹配的次數恰好就是$R$增加的次數，因此求出所有位置的$Z(i)$時間複雜度只需$\ord{N}$。
 
-\SourceCode[Z value]{z-value.cc}{14}{32}
 
 不過這和字串匹配有什麼關係呢？假設我們要拿 $B$ 匹配 $A$ ，只要令 $C = B \phi A$，其中 $\phi$ 是從來沒有在 $A, B$ 間出現過的字元，這樣如果 $A[i, i+k-1] = B, \: k = \abs{B}$ ，必有 $C[k+i+1, 2k+i] = C[0, k-1]$ ， 也就是
 $ Z_C(k+i+1) = k $。
@@ -831,7 +848,6 @@ $\hei(k_2)$ 表示 $S_B(\sa(k_2)), S_B(\sa(k_2-1))$ 前幾個字元一樣，$\he
 \end{enumerate}
 最後更新$e = \alpha_{k+1}$，增加$k$後重複步驟直到建完整個字串。\\
 以下是一個 Suffix Automaton 的範例程式碼：
-\SourceCode[naive-matching]{suffix-machine.cc}{16}{41}
 Suffix Automata 的應用非常多，從匹配到計數等等。另外 Suffix Automata 有一個很重要的性質：
 \begin{theorem}[定理]
   一個 $B$ 的後綴自動機上從起始點 $s$ 到任何一點 $v$ 的任何一條路徑都恰好對應到一個 $B$ 的子字串。
