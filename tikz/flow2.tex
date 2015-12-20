@@ -1,0 +1,40 @@
+\begin{tikzpicture}[x=1.6cm,y=1.6cm]
+  \node[source](s) at (0, 0) {$s$};
+  \node[source](t) at (3, 0) {$t$};
+  \foreach \x/\y/\name/\lab in {
+    1/0/$v_2$/v2,
+    2/0/$v_3$/v3%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {\name};
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u/\v/\f/\ff/\style in {
+      s/v2/4/3/{above},
+      v2/v3/6/4/{above},
+      v3/t/3/1/{above}%
+    }{
+      \draw[fed] (\u) edge[apply style/.expand once=\style] 
+      node{{\bf\ff}{\footnotesize/\f}} (\v);
+    }
+  \end{scope} 
+\end{tikzpicture}\hspace*{1cm}
+\begin{tikzpicture}[x=1.6cm,y=1.6cm]
+  \node[source](s) at (0, 0) {$s$};
+  \node[source](t) at (3, 0) {$t$};
+  \foreach \x/\y/\name/\lab in {
+    1/0/$v_2$/v2,
+    2/0/$v_3$/v3%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {\name};
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u/\v/\f/\ff/\style in {
+      s/v2/4/4/{above},
+      v2/v3/6/5/{above},
+      v3/t/3/2/{above}%
+    }{
+      \draw[fed] (\u) edge[apply style/.expand once=\style] 
+      node{{\bf\ff}{\footnotesize/\f}} node[below]{\small $+1$} (\v);
+    }
+  \end{scope} 
+\end{tikzpicture}

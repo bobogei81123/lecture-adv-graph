@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1.2cm,y=1.2cm]
+  \node[source](u) at (0, 0) {$u$};
+  \node[source](v) at (2, 0) {$v$};
+  \draw[fed] (u) edge node[above]{{\bf 3}{\footnotesize/5}} (v);
+  \draw[] (u) edge[bend right=60,white,very thick] (v);
+\end{tikzpicture}\hspace*{1cm}
+\begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+  \node[source](u) at (0, 0) {$u$};
+  \node[source](v) at (2, 0) {$v$};
+  \node[](uu) at (0, 0.4) {}; 
+  \node[](vv) at (2, 0.4) {};
+  \draw[fed] (u) edge node[above]{{\bf 5}{\footnotesize/5}} (v);
+  \draw[fed] (uu) edge[out=-70, in=-120,very thick] node[above]{$2$} (vv);
+\end{tikzpicture}\hspace*{1cm}
+\begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+  \node[source](u) at (0, 0) {$u$}; 
+  \node[source](v) at (2, 0) {$v$};
+  \node[](uu) at (0, 0.4) {}; 
+  \node[](vv) at (2, 0.4) {};
+  \draw[fed] (u) edge node[above]{{\bf 0}{\footnotesize/5}} (v);
+  \draw[fed] (vv) edge[out=-110, in=-60 ,very thick] node[above]{$3$} (uu);
+\end{tikzpicture}
+
