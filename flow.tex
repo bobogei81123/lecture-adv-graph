@@ -3,6 +3,8 @@
 \input{npsc.tex}  % by little fish (will be the deprecated doc-style)
 \input{ioicamp.tex}  % modifications for ioicamp
 \usepackage{caption}
+\usepackage{csquotes}
+\usetikzlibrary{patterns}
 \DeclareCaptionLabelFormat{cfig}{圖#2}
 \captionsetup{labelformat=cfig}
 
@@ -58,6 +60,7 @@
 
 \section{前言}
 
+\subsection{問題的定義}
 首先我們定義何謂網路流。
 
 \begin{theorem}[定義]
@@ -111,6 +114,7 @@
 s-t 可行流就稱作{\bf 最大流}。
 
 \section{最大流演算法}
+\subsection{剩餘網路}
 我們定義了最大流後，現在的問題是要如何找出一個最大流以及他的流量呢？
 
 一個最基本的想法應該是這樣子：不斷的增加流量，直到流滿為止。但如何
@@ -156,7 +160,7 @@ $3$ 單位的流量。 我們可以增大流量，相當於再流 $x$ 單位過�
 \begin{theorem}[定義]
   一個邊的{剩餘流量} $r(u, v)$ 定義為 \[ r(u, v) = c(u, v) - f(u, v) \]
   如果 $r(u, v) > 0$ ，則可以沿著這些邊擴充流量，因此 $r(u, v) > 0$ 
-  的所有邊構成的圖就稱作 {\bf 剩餘網路} 。
+  的所有邊構成的圖就稱作 {\bf 剩餘網路} ，對於一個流 $f$ 記作 $G_f$。
 \end{theorem}
 比如圖~\ref{fig:flow4} 中 $r(u, v) = c(u, v) - f(u, v) = 2$，至於 $r(v, u)$ ，
 因為 $(v, u)$ 沒有(有向)邊，所以可以看作 $c(v, u) = 0$ ，因此 $r(v, u) = 
@@ -165,6 +169,106 @@ c(v, u) - f(v, u) = 0 - (- f(u, v)) = 3$ 。
 如果我們把反向的剩餘流量也考慮進去後，之前的演算法就是正確的了！
 也就是我們只要不斷在剩餘網路中找 $s \leadsto t$ 的擴充路徑增加流量，
 直到沒有 $s \leadsto t$ 的路徑存在後，我們就找到最大流了。
+
+\subsection{對偶}
+讓我們先暫停一會兒，來看看什麼是對偶問題。
+
+我們遇到的問題往往是一體兩面的，在求某個問題的最小值其實就是在求
+另一個問題的最小值。 比如說「某A最多可以有幾個蘿莉在身旁還能保持
+理智」其實就是在問「要陷害某A去坐牢最少要準備多少蘿莉」。或著「
+給你 1000 元你最多可以活幾天」其實就跟「你要活一個月至少需要多少
+錢」是同一類問題。
+
+那最大流的對偶問題是什麼呢？想像一下今天你家裝了光世代 1G ，回家
+開 speedtest.net 測速發現只有 10M ，為什麼會這樣呢？原因就在
+光世代 1G 只是把你家出去的那條網線路換成 1G 流量而已，而網路連線
+要經過很多條線路，如果有一條線路只有 10M 的流量，那不管從你家出
+去的那條網路線有多快，瓶頸永遠卡在那條慢網路網。
+
+這告訴了我們一件事情：
+\begin{displayquote}
+  你的網速的最大值，就是途中經過的那些網路線中流速的最小值
+\end{displayquote}
+對最大流問題來說，就是
+\begin{displayquote}
+  {\bf 一個網路的最大流，就是把 $s$ 和 $t$ 卡住的那些邊的流量總和的
+  最小值。}
+\end{displayquote}
+我們把這個敘述用正式一點的語言描述：
+\begin{theorem}[定義]
+  一個 {\bf s-t 割}(cut) $C$ 是一個圖的分割，將圖中的點分成兩個集合 $C = (S, T)$，
+  滿足 $s \in S, \; t \in T$。我們定義這個割的大小為
+  \[ \abs{C} = \sum_{u \in S} \sum_{v \in T} c(u, v). \]
+  也就是所有滿足 $u$ 在 $S$，$v$ 在 $T$ 的邊 $(u, v)$ 的流量上限合。\\
+  (並不計算 $u$ 在 $T$ ， $v$ 在 $S$ 的邊。)
+
+  一個 {\bf 最小割}就是最小的一個割。
+\end{theorem}
+{\bf 而一個圖的最大流就是最小割的大小！}
+\begin{figure}[H]
+  \centering
+  \input{tikz/flow5.tex}
+\end{figure}
+
+我們用以下這個定理做總結。
+
+\begin{theorem}[Max-flow min-cut theorem]
+  對一個流量網路 $G$，以下三件事情是等價的。
+  \begin{enumerate}
+    \item $f$ 是一個 s-t 最大流。
+    \item 關於 $f$ 的剩餘網路 $G_f$ 沒有從 $s$ 到 $t$ 的擴充路徑。
+    \item $\abs{f} = \abs{C}$，其中 $C$ 是最小 s-t 割。
+  \end{enumerate}
+\end{theorem}
+
+\subsection{Ford–Fulkerson algorithm}
+之前以經說過，就算忘了 Max-flow min-cut theorem 再提醒了我們一次
+只要不斷在剩餘網路中找 $s \leadsto t$ 的擴充路徑增加流量，
+直到沒有 $s \leadsto t$ 的路徑存在後，就可以找到最大流了。
+因此一個最簡單的演算法如下。
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \caption{Ford-Fulkerson algorithm}\label{euclid}
+  \SetKwFunction{FF}{FordFulkerson}
+  \SetKwFunction{AAP}{AugmentAlongPath}
+  \SetKwProg{myalg}{Algorithm}{}{}
+  \myalg{\FF{}} {
+  \While{We could find an augmenting $P$ path from $s$ to $t$}{
+    $\Delta f \gets \AAP{P}$ \;
+    $f \gets f + \Delta f$ \;
+  }
+}
+\end{algorithm}
+這邊有幾個問題要注意
+\begin{enumerate}
+  \item 如何找一個擴充路徑？\\
+    基本上可以直接遞迴下去做(相當於最普通的 DFS)即可。
+  \item 找到了擴充路徑 $P$ 後，如何擴充？\\
+    首先顯然增加的流量就是{\bf 路徑上剩餘流量的最小值}， 
+    $\Delta f = \min\limits_{e \in P} r(e)$。
+    之後我們便將路徑上的邊的流量都加 $\Delta f$，但別忘了由定義
+    $f(u, v) = -f(v, u)$，也就是我們必須把反向的邊的流量減掉！
+    因此我們總結 $f, r$ 的變化，假設 $(u, v) \in P$：
+    \begin{align*}
+    f(u, v) \gets f(u, v) + \Delta f, \quad r(u, v) \gets r(u, v) - \Delta f \\
+    f(v, u) \gets f(v, u) - \Delta f, \quad r(v, u) \gets r(v, u) + \Delta f \\
+    \end{align*}
+  \item 圖的儲存：\\
+    由於 $c, f, r$ 只要知其二便可知剩下的一個，因此只需要存任兩個就好！
+    不過在 2. 我們發現其實只要知道 $r$ 我們就知道 $\Delta f$ 了，因此
+    {\bf 在大部分的情況下，只需要存 $r$ 就足夠了}。而在一開始時，
+    $f = 0$，因此 $r = c$。
+\end{enumerate}
+但還有一個最重要的問題，要做幾次擴充路徑這個演算法才會結束呢？很遺憾的是
+Ford-Fulkerson algorithm 沒有辦法給出一個好的次數上限！事實上有：
+\begin{itemize}
+  \item 如果流量上限都是整數，那麼這個演算法最差要做 
+    $\ord{\abs{f}}$ 次的擴充，其中 $\abs{f}$ 是最大流的流量。
+    總時間複雜度是 $\ord{\abs{E}\abs{f}}$。
+  \item 如果流量上限有無理數，那麼這個演算法無法保證會結束！
+\end{itemize}
+但神奇的是，我們只需要改變一點就可以改進這個演算法！
 
 \section{字串的儲存}
 通常最基本的儲存方式就是用一個陣列依序將字串的每一個字元存下來。不過當我們要同時儲存許多字串時，可能就要花點巧思了。而這邊要介紹一個可以同時儲存多個字串的資料結構─{\bf  字典樹 Trie}。\\
