@@ -269,736 +269,275 @@ Ford-Fulkerson algorithm 沒有辦法給出一個好的次數上限！事實上�
   \item 如果流量上限有無理數，那麼這個演算法無法保證會結束！
 \end{itemize}
 但神奇的是，我們只需要改變一點就可以改進這個演算法！
+\subsection{Edmonds-Karp algorithm}
+Edmonds-Karp algorithm 是 Ford-Fulkerson algorithm 的一個小改進，他的
+演算法如下：
 
-\section{字串的儲存}
-通常最基本的儲存方式就是用一個陣列依序將字串的每一個字元存下來。不過當我們要同時儲存許多字串時，可能就要花點巧思了。而這邊要介紹一個可以同時儲存多個字串的資料結構─{\bf  字典樹 Trie}。\\
-Trie的道理非常簡單，其實就是用一棵樹來儲存字串。在這棵樹上，每個點(除了根節點之外)上都有一個字元，而從根節點一路走到某個節點，依序經過的字元串起來就是那個點代表的字串。最後我們再記錄哪些點是一個字串的最後一個字元即可！
-如Figure~\ref{fig:trie}就是一個儲存$\{A_1 = \str{abc}, A_2 =\str{abde}, A_3 = \str{bc}, A_4 = \str{bcd}\}$的trie
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}
-    [every node/.style = {draw, circle, minimum size = 1cm}
-    ,edge from parent/.style = {draw, -latex, thick}
-    ,level distance = 20mm
-    ,endn/.style = {thick, double=gray!20, double distance = 2pt, fill=gray!20}]
-    \node{\char`\^}[grow=east] {
-      child{node {a} 
-        child{node {b} 
-          child{node[endn]{c}}
-          child{node{d}
-            child{node[endn]{e}}
-          }
-        }
-      }
-      child{node{b}[]
-        child{node[endn]{c}[grow=north east]
-          child{node[endn]{d}}
-        }
-      }
-    }
-    ;
-  \end{tikzpicture}
-  \caption{An example of trie}
-  \label{fig:trie}
-\end{figure}
-%
-\begin{theorem}[定義]
-  給定一個字典樹Trie \  $T = \{V, E\}$，我們定義$P_T(v)$為從根節點走到$v$所得出的字串。
-\end{theorem}
-而Trie的基本操作也都很簡單，如要新增一個字串$A$，我們就從根節點開始，依照字串$A$的第$0, 1, 2, \cdots, n-1$個字元，如果此字元在當前節點的子節點中就繼續走下去，否則就新增一個節點。
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \caption{Ford-Fulkerson algorithm}\label{euclid}
+  \SetKwFunction{FF}{FordFulkerson}
+  \SetKwFunction{AAP}{AugmentAlongPath}
+  \SetKwProg{myalg}{Algorithm}{}{}
+  \myalg{\FF{}} {
+  \While{We could find an \textit{\textbf{shortest}} augmenting $P$ path from $s$ to $t$}{
+    $\Delta f \gets \AAP{P}$ \;
+    $f \gets f + \Delta f$ \;
+  }
+}
+\end{algorithm}
+咦！怎麼好像一點差別也沒有？ 要仔細看！ 原來之前 Ford-Fulkerson algorithm
+是隨便找一條擴充路徑，現在 Edmonds-Karp 規定每次找的擴充路徑要是{\bf 最短
+  的一條}。
 
-\section{字串匹配}
-  字串匹配是一個生活中一定會遇到的問題。當你要從一篇滿滿文字的網頁或是pdf檔找關鍵字時，相信大家一定會本能的按下ctrl-f，接著一瞬間，電腦就會自動算好所有蒐尋字串出現的位置。看似簡單，嘿嘿！其實裡面可是有大學問的呢。
+令人意外的，加上了這個優化之後，可以證明最多只會找 $\ord{VE}$ 次擴充路徑，
+不論流量是不是無理數！有時候一個小小的優化也可以造成很大的改變。
 
-\SampleProblem[Everywhere]{String Matching}{ 給你兩個字串 $A$, $B$ 找出所有 $B$ 出現在 $A$ 中的位置。}
+\section{最大流模型}
+知道了如何解最大流問題之後，我們就可以開始解一些題目了。
+\SampleProblem[UVa 820]{Internet Bandwidth}{ 
+  現在有一些機器可以互相傳訊，但兩個機器 $u, v$ 間會有一個
+  傳訊的頻寬上限 $c(u, v)$ ，問你從機器 $s$ 傳訊到 $t$ 的
+  最大頻寬是多少？
+}
+這題沒有什麼好說的，祼的最大流問題。 
 
-而一般大家最先想到的做法通常是…就把所有的位置試過一遍！ 
+但最大流問題常常會出的讓你乍看之下不像最大流的題目，
+要經過一些轉換或是先得出一些結論後，才能用最大流問題
+來解！這也是為什麼最大流問題往往是難題的原因！
 
-這樣寫好不好呢？其實可以證明這樣的{\bf 期望複雜度}是$\ord{\abs{A}}$。可惜的是，最差的情況可以到$\ord{\abs{A}\abs{B}}$！更糟的是很容易構造出例子，如$A = \mcstr{AAAAA}{AA}, B = \mcstr{AAA}{B}$，這樣雖然$B$從來沒有出現在$A$中，但是每個位置我們都必需匹配到$B$的最後一個字元才能確定匹配失敗！
-那要怎麼改進這個演算法呢？著手點有兩個：
+比如以下這題
+\SampleProblem[經典問題]{不重複路徑數}{ 
+  給你一張圖 $G$ ，請找出最多的 $u$ 到 $v$ 的路徑，
+  使得這些路徑都不重複。
+}
+嗯？好像題目裡沒有一個「流」字啊？不過我們可以這樣想，
+路徑不能重複，就是每條邊最多只能被走過一次！因此把每個
+邊的流量設為 $1$ ，求 $u$ 到 $v$ 的最大流就是答案！
+
+這種把看似不相關的題目轉化成別的題目來求解就是建模。
+我們整理一下常見的建模手法。
 \begin{enumerate}
-  \item 事前處理：我們剛剛一拿到兩個字串便埋頭苦幹，但如果我們能先對這兩個字串做點觀察、處理，或許能得到一些有用的資訊。
-  \item 善用已知的資訊：在匹配的過程中，或許我們也可以得到一些訊息！顯然這個做法並沒有妥善利用！
+  \item 點有容量限制： 我們最大流問題中的流量限制都是在
+    邊上而已，無法限制點容量！不過我們可以把每個原來的
+    每個點 $v$ 都拆成 $v^+, v^-$，分別連接進來的流量
+    和出去的流量，而 $c(v^+, v^-)$ 就設成點的流量上限即可！
+
+  \item 多個源/匯點： 有時候源/匯點不只有一個，這是後可以
+    多建一個超級源/匯點，並連一個無限大流量的邊到所有源/匯點。
+
+  \item 無限制流量邊： 通常選一個很大的數，如 $2^{30}$ 等等當
+    做容量即可， 只要保證流量永遠不可能達到這個數值，以及這個
+    數值不會在計算過程中溢位即可。
 \end{enumerate}
-\section{Hashing}
-想想看你要在茫茫人群中找你的同學，通常會怎麼找呢？不外乎是先看衣服顏色，髮形之類的。沒錯！如果我們可以把東西加以分類，便可加速蒐尋速度！但當然，分類也是有技巧的，就像你不會用"正立/倒立走路"或是"指紋圖形"來分類路人，因為前者沒有多少人是用倒立走路的吧，而後者雖然極精確，但也太花時間了！\\
-在字串上也是相同的道理，總而言之我們想做的事情是：
+我們再來看一些例題。
+
+\SampleProblem[經典問題]{二分圖最大匹配}{ 
+  給你一個二分圖，求他的最大匹配。
+}
+所謂的匹配就是把盡量多的點對配在一起，兩個點可以被配對
+若且為若他們有邊相連，而且一個點只能被配到一次。你可以想
+像點就代表一些男生女生，有邊相連表示彼此喜歡，你要當月下
+老人湊合最多對出來。
+
+經過一翻思考我們可以發現「只能被配到一次」可以用流量 $1$ 來限制
+，具體來說假設二分圖的兩個點集是 $V_1, V_2$ ，$V_1$ 裡的所有
+的點就從 $s$ 流一條流量為 $1$ 的邊，$V_2$ 裡的點則流一條流量 $1$ 
+的邊到 $t$ 。而本來的邊流量上限也全部設成 $1$，求 $s$ 到 $t$ 的最
+大流就是答案。
+
+\SampleProblem[經典問題]{混合圖的歐拉回路}{ 
+  給你一個連通的混合圖，也就是同時存在有向邊和無向邊的圖，
+  問你存不存在一條歐拉回路。
+}
+要解決這題必須先有一些知識！一個無向圖有沒有歐拉回路的條件大家都會，
+就是每個點的度數都要是偶數且連通。 而有向圖的歐拉回路存在的條件也差不多：
+\begin{itemize}
+  \item 每個點的入度要等於出度，也就是 $\deg^+(v) = \deg^-(v)$。
+  \item 所有的點連通。
+\end{itemize}
+那有向圖呢？其實我們要做的事情就是把所有的無向圖定向，讓整張圖變成有向圖，
+並滿足以上兩點的限制。首先我們先定義 $\delta(v) = \deg^-(v) - \deg^+(v)$，
+也就是不計算無向邊的情況下，入邊跟出邊的差。我們的目標就是最後要讓 $\forall v, \delta(v) = 0
+$。可以這樣想， $\delta(v) > 0$ 的點表示入邊太多了，必須想辦法從無向邊「流
+出」 $\delta(v)$ 的量，才可以變成 $\delta(v) = 0$，$\delta(v) < 0$ 亦同，表示
+要「流入」$\abs{\delta(v)}$。有沒有發現這個看似與流量無關的題目瞬間與最大流有了聯繫！
+我們只需要對於 $\delta(v) > 0$ 的點從 $s$ 建一條流量為 $\delta(v)$ 的邊
+\footnote{可能有人會認為是要從 $v$ 建到 $t$ 才對，其實不然，因為這些點必需要
+  流出 $\delta(v)$，可以想成我們從 $s$ 強制給了他 $\delta(v)$ 的流，這樣他就必定要
+  流出 $\delta(v)$ 了。}
+，$\delta(v) < 0$ 的點則建一條到 $t$ 流量為 $-\delta(v)$ 的邊。
+而如果 $(u, v)$ 本來有無向邊相連，就建
+一條 $(u, v)$ 流量為 $1$ 的無向流量。最後看最大流是不是等於 $\sum_{\delta(v) > 0} \delta(v)$ 
+，也就是是否所有的點都被補滿了即可。
+
+\section{最小割模型}
+大家應該還記得前面有提到最小割的對偶問題就是最大流，因此有些題目會以最小割的型式出現，
+這些題目也可以轉化成最大流來解。比如這個問題
+
+\SampleProblem[UVa 11506]{Angry Programmer}{
+  你被你老闆開除了，因此你決定在他打 LOL 的時候讓他斷線。
+  從他的電腦 $s$ 到 LOL 伺服器 $t$ 有一些 Router，Router 間有一些
+  網路線相連，剪掉 $u$ 到 $v$ 的網路線要花 $c(u, v)$，如
+  果 $s$ 到 $t$ 沒辦法經過一些 Router 連到就會斷線，問你要達成計畫
+  的最小花費。
+}
+
+這個問題其實就是裸的最小割問題，直接轉成最大流來解就可以了。不過當
+然，還是有一些經典的建模方式要了解！
+
+\subsection{「分兩類」問題}
+這個是最小割最常見的應用！通常題目會要你把點分成兩堆，比如以下這題。
+
+\SampleProblem[經典問題]{生產產品問題}{
+  你有 $n$ 個產品可以生產，並且有 $m$ 種不同的機器，生產第 $i$ 個產
+  品必須要有一些機器，但不同的產品如果用到相同的機器的話只需要一個
+  機器即可，現在給你每個機器的價格，和生產每個產品的獲利，你要決定
+  要生產哪些產品使你的獲利最高。
+}
+
+其實你要做的事情就是把產品和機器分成兩類，要的和不要的。可以想像每一個
+產品和機器都是一個點，現在要把他們分成 $(S, T)$，其中 $S$ 是我們要的，
+$T$是我們不要的。有沒有突然有一種 Cut 的感覺了？我們只要讓他的割剛好等
+於題目的 cost 就可以了！以下列出一些經典的建模方式。
 \begin{enumerate}
-  \item 找到一個分類函數，即是一個$f: \mathbb{S}(\Sigma) \mapsto \mathbb{Z}$，把所有可能的字串打到有界的整數，不妨說$f(s) \in [0, M-1] \; \forall s$吧！
-  \item 這個函數最好是均勻分部在$[0, M-1]$上。
-  \item 計算這個函數最好不需花太多時間！
+  \item 選 $u$ 但不選 $v$ 要花費 $c$：由我們的定義 $u \in S, v \in T$，
+    因此由割的定義我們知道只要建 $u \rightarrow v$，流量是 $c$ 的邊即可。
+  \item 選 $u$ 就一定要選擇 $v$：其實這只是 1. 的一個特例而已，就是
+    選 $u$ 但不選 $v$ 要花費 $\infty$，因此建 $u \rightarrow v$ 流量是 $\infty$ 
+    的邊即可。
+  \item 選 $u$ 要花費 $c$：這表示 $u \in S$，因此建 $u \rightarrow t$ 流量是
+    $c$ 的邊即可。
+  \item 選 $u$ 會賺到 $c$：這個比較麻煩，因為沒有負花費，也就是負容量這種東西。
+    不過我們可以換個角度想，變成「沒有選到 $u$ 會失去賺 $c$ 的機會」，因此我們
+    先把所有選了會賺的點 $u_i$ 都找出來，假設會賺 $c_i$，計算 $C = \sum c_i$，
+    表示你全部有機會賺到的量，之後就建 $s \rightarrow u$，流量為 $c$ 的邊，表
+    示你一但不選就要失去這個 $c_i$ 了。最後求完最小割在把 $C$ 加上去即可。
 \end{enumerate}
+剛剛那題的解法就很清楚了，先計算所有產品的總獲益 $C$，對每個產品，依照 4.，建
+從 $s$ 流量等於其獲利的邊。再依 3. 對每個機器建一條到 $t$ 流量為其花費的邊。
+最後有些產品需要某些機器，也就是「選了這個產品就一定要選一些機器」，由 2.，建
+一些無限大的邊即可。
+
+\section{最小花費最大流}
+我們將原本的最大流問題做一個推廣，現在每個邊除了有容量限制 $c$ 以外，還有一個
+花費 $k(u, v)$ ，表示每單位流量流過要花 $k(u, v)$ 的價格。也就是說對於一個流
+$f$，這個流的總花費為
+\[ k(f) = \sum k(u, v) \cdot f(u, v) \]
+{\bf 最小花費最大流}就是在滿足一個流 $f$ 是圖上的最大流之下，使 $f$ 的花費越小越好。
+
+\subsection{最小花費最大流演算法}
+
+我們先定義一個路徑的花費。
 \begin{theorem}[定義]
-  一個滿足以上條件的函數我們就稱作\emph{Hash function}
+  一個路徑 $P$ 的花費 $k(P)$ 就是其所有邊的花費總合。
 \end{theorem}
-有了Hash function後有什麼用呢？有的！雖然我們{\bf 無法保證$A \neq B \; \Rightarrow f(A) \neq f(B)$}，因為$f$把有無窮多個元素的字串集合打到有限個整數上，當然會有許多字串被打到同一個整數！但至少我們會知道
-\[
-  f(A) \neq f(B) \quad \Rightarrow \quad A \neq B
-\]
-也就是說如果兩個字串的Hash value不一樣，那我們連匹配都不需要了，他們鐵定不相等！
-至於Hash function要怎麼找呢？一個常用的方法如下
-\begin{theorem}[Rabin-Karp rolling hash function]
-  給定$p, q$，令
-  \begin{align*}
-    f(A) &= a_0 p^{n-1} + a_1 p^{n-2} + \cdots + a_{n-2} p + a_{n-1} \mod{q}\\
-         &= \sum_{0}^{n-1} a_i p^{n-i-1} \mod{q} \numbereqn \label{rol}
-  \end{align*}
-\end{theorem}
-看起來很複雜，其實就是字串$A$在$p$進位制代表的值模$q$而已！那這個函數有符合我們的需求嗎？首先他把每個字串打到$[0, q-1]$，可以想成他把所有字串分成$q$類。另外數學家跟我們說，如果$p,q$取兩個不同的質數，通常結果會不錯，非常均勻\footnote{可以參考習題1-8}！另外計算這個函數只需要$\ord{|A|}$，並且他還有一個很好的性質！
-\begin{theorem}[Sliding Window]
-  假設$f$由\eqref{rol}給出，則
-  \begin{equation}
-    \label{sld1}
-    f(A) \equiv f(A[0, n-2]) p + a_{n-1} \pmod{q}
-  \end{equation}
-  並且
-  \begin{equation}
-    \label{sld2}
-    f(A[i, j]) \equiv f(A[0, j]) - p^{j-i+1} f(A[0, i-1]) \pmod{q}
-  \end{equation}
-\end{theorem}
-這些都可以由\eqref{rol}計算得出。\eqref{sld1}告訴了我們計算字串$A$所有前綴的hash value可以在$\ord{\abs{A}}$的時間用遞迴求出！仔細看\eqref{sld2}可以發現如果知道了$A$所有前綴的hash value，任何$A$的子字串的hash value都可以在$\ord{1}$的時間計算出來\footnote{真的嗎？$p^{j-i+1}$怎麼辦？}！ \\
-回到我們字串匹配的問題，相信大家都看出來了，我們只需要事先算出$A$所有前綴的hash value和$f(B)$，再枚舉$A$所有長度為$\abs{B}$的子字串(差不多$\ord{A}$個)，最後計算這些子字串的hash value是不是等於$f(B)$，總共只需要$\ord{N}$…
-等等！回想我們剛剛說的：我們知道$f(A) \neq f(B) \Rightarrow A \neq B$，但卻無法保證$f(A) = f(B) \Rightarrow A = B$啊？有人可能會想說："相等時重新檢查一次"，但如果$A = \mcstr{AAA}{AAA}, B = \mcstr{AA}{AA}$，完蛋了！又退化成$\ord{\abs{A} \abs{B}}$了！ \\
-那怎麼辦呢？答案是：把$q$取大一點，然後就假設$f(A) = f(B)$的機率很小，不會發生！事實上如果$f$是均勻的，那$f(A) = k$的機率差不多是$1/q$！只要$q$取夠大，比如一個\texttt{long long}的質數，差不多$10^{15}$，那麼兩個不同的字串{\bf 碰撞}的機率是$10^{-15}$，是一個人被閃電打到兩次的機率\footnote{機率一次差不多是$8 \times 10^{-7}$}，不太可能啦！
-
-\section{KMP}
-剛剛說的Hashing method畢竟還是一個機率演算法，而且模運算是很花時間的！因此這邊要講一個很厲害的演算法，Knuth–Morris–Pratt algorithm！ \\
-我們先回到一開始naive matching失敗的例子，$A = \str{aabaabaac}, B = \str{aabaac}$，我們第一次的匹配如下，在$5$的位置匹配失敗。
-
-    \begin{figure}[H]
-    \begin{center}
-      \begin{tikzpicture}
-        \node at (-0.5, 1.3) {$ i = $};
-        \node at (-0.5, .5) {$ A = $};
-        \foreach \c [count=\x from 0] in {a,a,b,a,a,b,?,?} {
-          \ifthenelse{\x = 5}
-          { \draw[fill=gray!80] (\x, 0) rectangle ++(1, 1) }
-          { 
-            \ifthenelse{\x > 5}
-            { \draw[fill=gray!0] (\x, 0) rectangle ++(1, 1) }
-            { \draw[fill=gray!30] (\x, 0) rectangle ++(1, 1) }
-          }
-          node[midway] {\large \c} 
-          node[midway, yshift=0.8cm] {\x};
-        }
-        \node at (8.5, 0.5) {$\cdots$} ;
-
-        \node at (-0.5, -.8) {$ B = $};
-        \node at (-0.5, -1.6) {$ j = $};
-        \foreach \c [count=\x from 0] in {a,a,b,a,a,c} {
-          \ifthenelse{\x = 5}
-          { \draw[fill=gray!80] (\x, -1.3) rectangle ++(1, 1) }
-          { \draw[fill=gray!30] (\x, -1.3) rectangle ++(1, 1) }
-            node[midway] {\large \c} 
-            node[midway, yshift=-0.8cm] {\x};
-        }
-
-      \end{tikzpicture}
-    \end{center}
-    \caption{}
-    \label{fig:}
-    \end{figure}
-
-那些$A$還沒被匹配過的地方我們用? 表示。現在如果我們用最原始的方法，我們必須將$B$右移一格繼續匹配，重新來過。但仔細觀察就會發現
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}
-    \node at (-0.5, 1.3) {$ i = $};
-    \node at (-0.5, .5) {$ A = $};
-    \foreach \c [count=\x from 0] in {a,a,b,a,a,b,?,?} {
-      \ifthenelse{\x = 5}
-      { \draw[fill=gray!30] (\x, 0) rectangle ++(1, 1) }
-      { 
-        \ifthenelse{\x > 5}
-        { \draw[fill=gray!0] (\x, 0) rectangle ++(1, 1) }
-        { \draw[fill=gray!30] (\x, 0) rectangle ++(1, 1) }
-      }
-      node[midway] {\large \c} 
-      node[midway, yshift=0.8cm] {\x};
-    }
-    \node at (8.5, 0.5) {$\cdots$} ;
-
-    \foreach \c [count=\x from 0] in {a,a,b,a,a,c} {
-      \ifthenelse{\x = 0}
-      { \draw[fill=gray!30] (\x, -1.3) ++ (1, 0) rectangle ++(1, 1) }
-      { \ifthenelse{\x = 1} 
-        { \draw[fill=gray!80] (\x, -1.3) ++ (1, 0) rectangle ++(1, 1) }
-        { \draw[fill=gray!0] (\x, -1.3) ++ (1, 0) rectangle ++(1, 1) }
-      }
-        node[midway] {\large \c} ;
-    }
-
-    \foreach \c [count=\x from 0] in {a,a,b,a,a,c} {
-      \ifthenelse{\x = -1}
-      { \draw[fill=gray!30] (\x, -2.5) ++ (2, 0) rectangle ++(1, 1) }
-      { \ifthenelse{\x = 0} 
-        { \draw[fill=gray!80] (\x, -2.5) ++ (2, 0) rectangle ++(1, 1) }
-        { \draw[fill=gray!0] (\x, -2.5) ++ (2, 0) rectangle ++(1, 1) }
-      }
-        node[midway] {\large \c} ;
-    }
-
-    \foreach \c [count=\x from 0] in {a,a,b,a,a,c} {
-      \ifthenelse{\x < 3}
-      { \draw[fill=gray!30] (\x, -3.7) ++ (3, 0) rectangle ++(1, 1) }
-      { \ifthenelse{\x = 3} 
-        { \draw[fill=gray!50] (\x, -3.7) ++ (3, 0) rectangle ++(1, 1) }
-        { \draw[fill=gray!0] (\x, -3.7) ++ (3, 0) rectangle ++(1, 1) }
-      }
-        node[midway] {\large \c} ;
-    }
-
-  \end{tikzpicture}
-\caption{}
-\label{fig:}
-\end{figure}
-
-右移$1, 2$格分別在$1, 0$的位置就匹配失敗了。注意到這兩個位置都對應到$A[2]$，而$A[2]$是我們早就匹配過的！也就是說這個"失敗"是我們應該要知道的。更甚者，這整件事情只跟$B$本身有關！因為我們早以確認過$A[0, 4] = B[0, 4]$。換句話說，對於一個字串$B$，不論$A$是多少，我們早就可以知道某些$(j, s)$，代表"如果我們在$B[j+1]$的位置匹配失敗後，往前$s$格繼續匹配"這件事情，是完全不必要的！\\
-那到底在$B[j+1]$匹配失敗時，我們該往右移幾格呢？根據我們上面的討論，如果我們已經匹配了$A[i, i+j] = B[0, j]$，現在將$B$右移$s$格，那麼至少$A[i+s, i+j] = B[0, j-s]$，也就是
-\[ B[0, j-s] = A[i+s, i+j] = B[s, j] \]
-因此我們應該要找第一個(最小的)$s$滿足上式，也就是最大的$j-s$。這就是我們要定義的KMP裡一個非常重要的函數─失敗函數$\fail(j)$。
-
-\begin{theorem}[定義(Fail function)]
-  對於一個字串$B = b_0 b_1 \cdots b_{m-1}$，我們定義
-  \[
-    \fail_B(i) = 
-    \begin{dcases}
-      \max \{ k: P_B(k) = B[0, k] = B[i-k, i] \} & \text{if } i \neq 0 \text{ and at least a $k$ exists}\\
-      -1 & \text{else}\\
-    \end{dcases}
-  \]
-  $\fail(i)+1$也稱作在第$i$個位置的\emph{共同前後綴}長度
-\end{theorem}
-
-由上面的推論，我們總結$\fail(j)$的一個非常重要的性質：{\bf $\fail_{B}(j)$告訴我們在拿$B$去匹配$A$的過程中，如果$B[0, j]$已經匹配成功，但在第$j+1$個位置匹配失敗了，應該要把$B$的第$\fail(j)$個字元對齊原本$B[j]$的位置繼續匹配}！舉個例子，容易知道如果$B = \str{aabaabd}$，則 $ \{\fail(j)\} = \{-1, 0, -1, 0, 1, 2, -1\}$，假設我們已經匹配$B[0,4]$，但在第$5$個字元出問題了，
-\begin{monobox}
-01234567
-A = aabaaa?????
-    |||||*        Matching failed at position 5
-B = aabaabd         
-       ||*        F(4) = 1, Matching failed at position 2
-       aabaabd
-        |*        F(1) = 0
-        aabaabd
-\end{monobox}
-這樣我們一次可能往前一大步，而不用每次位移一格重新匹配了！\\
-現在只剩一個問題了，要怎麼求失敗函數呢？其實很簡單，假設我們已經求出了\\
-$\fail(i), \forall 0 \leq i \leq n$，現在要求$\fail(n+1)$，根據定義相當於要求最大的$k = k'+1$使$B[0, k] = B[n+1-k, n+1]$。而
-\[
-  B[0, k] = B[n+1-k, n+1] \; \Leftrightarrow \; B[0, k'] = B[n-k', n] \land B[k'+1] = B[n+1]
-\]
-由失敗函數的定義我們知道$k'$最大只能是$\fail(n)$，如果此時$B[\fail(n)+1] = B[n+1]$我們立刻便知道$\fail(n+1) = \fail(n) + 1$。但如果不是怎麼辦？難道必需 $k' = \fail(n)-1 , \fail(n)-2\cdots, 0$ 一直試下去嗎？不要忘記我們已經算出所有 $n$ 以下的 $\fail(i)$ 了，而 $\fail(j)$ 告訴我們在$B$匹配$A$的過程中，如果
-\[ A[i, i+j] = B[0, j] \; \land \; A[i+j+1] \neq B[j+1] \]
-我們應該把$B$的第$\fail(j)$個字元對齊原本$B[j]$的位置繼續匹配，令$A = B, i = n - \fail(n), j = \fail(n) \leq n$，上式變成
-\[ B[n - \fail(n), n] = B[0, \fail(n)] \; \land \; B[n+1] \neq B[\fail(n)+1] \]
-這不恰恰是我們現在的情況嗎？因此由 $\fail(j) = \fail(\fail(n))$ ，我們便把當前位置($n$)對齊 $B[\fail(\fail(n))]$。也就是下一個要試的$k'$是$\fail(\fail(n))$！如果又失敗，我們便再試$\fail^3(n), \fail^4(n) \cdots$，直到終於成功或是確認沒有$k$存在($\fail(n+1) = -1$)。這正是失敗函數的精髓！他告訴我們一旦失敗該何去何從。\\
-這邊附上一個KMP的範例程式碼，並總結一下KMP的性質。
-
-
+與最大流類似，最小花費最大流有以下的性質：
 \begin{theorem}[定理]
-  對於一個字串$B$，有
-  \begin{itemize}
-    \item $B[0, \fail(i)]$是$B$最長的一個前綴使得$B[0, \fail(i)] = B[i - \fail(i), i]$但$\fail(i) \neq i$
-    \item 令$\fail^k(i) = \overbrace{f \circ f \circ \cdots \circ f}^{k} (i)$，則：
-      \begin{itemize}
-        \item $\exists n, \; \fail^n(i) = -1$
-        \item $ \fail^{k+1}(i) < \fail^{k}(i) \quad \text{if} \quad \fail^k(i) \neq -1 $ \listeqn \label{fail2}
-        \item 令$K = \{ i, \fail(i), \fail^2(i) , \cdots , \fail^{n-1}(i), \fail^n(i) = -1\}$，則\\$B[0, k] = B[i-k, i] \; \Leftrightarrow \; k \in K$ \listeqn
-      \end{itemize}
-    \item $-1 \leq \fail(i+1) \leq \fail(i) + 1$ \listeqn
-  \end{itemize}
+  一個流 $f$ 是一個最小花費最大流若且唯若其剩餘網路上沒有{\bf 負環}，
+  也就是花費為負的環。
 \end{theorem}
-
-最後我們分析一下KMP的時間複雜度，參考範例程式碼，可以發現不管在計算$\fail$或是在匹配，對於每一次的匹配，當前$B$的匹配位置(current\_pos)會
-\begin{enumerate}[(a)]
-  \item 被疊代入$\fail$若干次。
-  \item 如果匹配成功，便加$1$。
-\end{enumerate}
-但因為\eqref{fail2}，我們知道每次疊代current\_pos至少會減$1$，並且疊代到$-1$時便會停止，因此(a)中疊代的次數不會超過(b)被執行的次數！而(b)又不會超過字串的長度，所以KMP的時間複雜度是$\ord{\abs{A} + \abs{B}}$，線性！
-
-\section{Aho–Corasick Algorithm*}
-  Aho-Corasick Algorithm 可以說是 KMP 的強化板。如果今天我們要在字串$A$上搜尋很多字串$B_1, B_2, \cdots B_n$要怎麼做？當然我們可以做$n$次KMP得到一個$\ord{n\abs{A} + \sum\abs{B}}$的方法，但信不信由你，其實我們可以在$\ord{\abs{A} + \sum \abs{B}}$的時間完成！ \\
-%
-  KMP在進行字串匹配之前必需要計算失敗函數，與此類似，Aho-Corasick Algorithm要先造出一個AC自動機，聽起來很炫，好像是可以自動幫我們AC題目的機器，其實應該只是Aho-Corasick的縮寫而已啦！ \\
-
-  還記得KMP的Fail function $\fail$嗎？其實我們可以想像Fail function 是一堆指針，告訴我們匹配失敗時要回到哪裡。現在我們要推廣到多個匹配字串呢？首先我們要把所有的匹配字串建成一棵{\bf 字典樹Trie}，
-  此時你會發現，匹配的過程其實就是在Trie上面移動！假設我們已經在點 $v$ ，如果下一個字元 $A[i+1]$ 存在於 $v$ 的子節點中，那我們就繼續往下走。
-  現在和單字串匹配其時一模一樣！我們現在只需要克服那一個共同的問題即可，當匹配失敗時，也就是 $A[i+1]$ 不在 $v$ 的子節點中，如何避免回到根節點全部重新來過？ 回憶一下 $\fail(j)$ 的定義 
-  \[ B[0, \fail(j)] = P_B(\fail(j)) = B[j-\fail(j), j], \quad \text{且 }\fail(j) \text{ 最大}\]
-  也就是說$P_B(\fail(j))$要是$B[0, j]$的後綴 \footnote{回憶一下$\fail(i)+1$也是{\bf 最長共同前後綴}長度}
-  。那在字典樹上，我們理所當然應該修正為以下的定義
-
-\begin{theorem}[定義]
-  對於一個字典樹$T = \{V, E\}$，其中$v_0$為他的根節點，對$v \in V$我們定義
-  \[
-    \flk(v) = 
-    \begin{dcases}
-      u & \text{if } P_T(u) \text{ 是 }P_T(v)\text{ 的一個後綴且 }\abs{S_T(u)}\text{最大} \\ 
-    v_0 & \text{else}
-    \end{dcases}
-  \]
-\end{theorem}
-記得$P_T(v)$ 我們定義成從根節點走到$v$的字串。
-這樣與KMP時一樣，我們匹配失敗時就沿著$\flk(v)$往下走，直到可以繼續匹配下去或是回到了根節點了。\\
-現在唯一的問題只剩下如何建出$\flk(v)$了。觀察後可發現
-\[
-  u = \flk(v) \quad \Rightarrow \quad \abs{S_T(u)} < \abs{S_T(v)}
-\]
-因此我們可以以BFS的順序，逐一建出這個表！
-與KMP相似，匹配時若失敗便往$\flk(v)$走，直到走到根節點或是終於匹配成功為止。
-
-\section{Z Algorithm}
-  在計算一個答案時，如果能妥善利用已知的資訊，便可以加速計算所需的時間。而Z Algorithm便是充分的利用這一點。現在我們就來介紹這個名字很帥氣的演算法。
-  首先我們定義Z function
-\begin{theorem}[定義]
-  對於一個字串$A = a_0 a_1 \cdots a_{n-1}$，定義
-  \[
-    Z_A(i) = \begin{dcases}
-      0, \quad \text{if } i = 0 \text{ or } A[i] \neq A[0] \\
-      \max \{ k : A[0, k-1] = A[i, i+k-1] \}, \quad \text{else}
-    \end{dcases}
-  \]
-\end{theorem}
-看起來和失敗函數$\fail(i)$有點像，但不一樣的是$Z(i)$表示$A$的後綴$S_A(i)$，也就是從$A[i]$開始的字串，可以和$A$自已匹配多長。舉例來說如果$A = \str{abcabc}$，則$Z(3) = 3$。
-
-現在我們需要一個快速求出所有 $Z(i)$ 的方法，假設我們已經知道了 $Z(i) = z$，也就是 $A[0, z-1] = A[i, i+z-1]$。那麼 $Z(i+1), Z(i+2), \cdots , Z(i+z-1)$ 是否會和 $Z(1), Z(2), \cdots, Z(z-1)$ 有關係呢？
-事實上Z function有一個很重要的性質是
+而且還有一個很重要的性質
 \begin{theorem}[定理]
-  對於一個字串$A = a_0 a_1 \cdots a_{n-1}$，如果$Z(i) = z$，則
-  \begin{itemize}
-    \item $A[k] = A[i+k], \quad \text{if } \; 0 \leq k < z$.
-    \item $A[z] \neq A[i+z]$. \listeqn \label{eq:z-0}
-    \item 令$L = i, R = i + z - 1$，現在假設$L \leq j \leq R, j' = j - L$，則：
-      \begin{itemize}
-        \item 如果$j' + Z(j') < z $，則 $Z(j) = Z(j')$ \listeqn \label{eq:z-1}
-        \item 如果$j' + Z(j') > z$， 則 $Z(j) = R - j + 1$ \listeqn \label{eq:z-2}
-        \item 如果$j' + Z(j') = z$， 則 $Z(j) \geq R - j + 1 = Z(j')$ \listeqn \label{eq:z-3}
-      \end{itemize}
-  \end{itemize}
+  如果在剩餘網路上沒有負環，現在我們找一個花費最小的路徑擴充，則擴充後
+  剩餘網路上還是不會有負環。
 \end{theorem}
-重點是\eqref{eq:z-1}, \eqref{eq:z-2}, \eqref{eq:z-3} 這三個case，我們來好好解釋
-\begin{enumerate}[label=Case \arabic*.]
-  \item $j' + Z(j') < z$
-    \begin{figure}[H]
-    \begin{center}
-      \begin{tikzpicture}[scale=0.8, transform shape]
-        \draw[line width=0.5mm] 
-        (0, 0) -- (7, 0)
-        (0, -.3) -- (0, .3)
-        (2, -.2) -- (2, .2)
-        (3, -.2) -- (3, .2)
-        (7, -.3) -- (7, .3)
-        (6, -.2) -- (6, .2)
-        (9, 0) -- (16, 0)
-        (9, -.3) -- (9, .3)
-        (16, -.3) -- (16, .3)
-        (10, -.2) -- (10, .2)
-        (11, -.2) -- (11, .2)
-        (12, -.2) -- (12, .2)
-        (15, -.2) -- (15, .2)
-        ;
+因此我們就立刻可以得出以下的一個演算法！\\
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \caption{Successive shortest path algorithm}\label{euclid}
+  \SetKwFunction{FF}{SSP}
+  \SetKwFunction{AAP}{AugmentAlongPath}
+  \SetKwProg{myalg}{Algorithm}{}{}
+  \myalg{\FF{}} {
+  \While{We could find an minimum cost augmenting $P$ path from $s$ to $t$}{
+    $\Delta f \gets \AAP{P}$ \;
+    $f \gets f + \Delta f$ \;
+  }
+}
+\end{algorithm}
+至於「找一個花費最小的路徑」，可以用任何最短路演算法來求，但要注意圖上可能會有
+負權邊，因此必須要使用能處理負權邊的演算法(如 SPFA 等等)。
 
-        \draw[line width=0.4mm] 
-        (2, 1) -- (5, 1)
-        (2, .8) -- (2, 1.2)
-        (3, .8) -- (3, 1.2)
-        (4, .8) -- (4, 1.2)
-        (5, .8) -- (5, 1.2)
+而這個演算法的整體複雜度，因為花費最小的路徑顯然不一定是最短 \footnote{這邊指
+  邊的數量最少} 的擴充路徑，所以跟 Ford-Fulkerson 一樣，擴充的次數沒有被保證！
+在邊權都是整數的情況下複雜度為 $\ord{\mathit{SP} \cdot \abs{f}}$ ，其中
+$\ord{\mathit{SP}}$ 是一次最短路演算法的複雜度。
 
-        (11, 1) -- (14, 1)
-        (11, .8) -- (11, 1.2)
-        (12, .8) -- (12, 1.2)
-        (13, .8) -- (13, 1.2)
-        (14, .8) -- (14, 1.2)
-        ;
-        \draw[latex-]
-        (6.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$z-1$};
-        \draw[latex-]
-        (2.5, 1.5) -- ++(0, 1) node[above, scale=1.2]{$j'$};
-        \draw[latex-]
-        (4.5, 1.5) -- ++(0, 1) node[above, scale=1.2, xshift=0.3cm]{$j' + Z(j') - 1$};
-        \draw[latex-]
-        (9.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$L$};
-        \draw[latex-]
-        (11.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$j$};
-        \draw[latex-]
-        (15.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$R$};
-      \end{tikzpicture}
-    \end{center}
-    \caption{}
-    \label{fig:}
-    \end{figure}
+\section{最小花費最大流的應用}
+有了求最小花費最大流後，不少原來的題目都可以做一個推擴。
+\SampleProblem[經典問題]{二分圖最小花費最大匹配}{ 
+  給你一個邊有權值的二分圖，求他的最小花費最大匹配。一個匹配的花費就是
+  所有邊的權值的和。
+}
+這個問題就只是把本來的二分圖最大匹配用最小花費最大流下去做就可以了。這邊就
+不在多述。
 
-    這種情況因為沒有超出以前計算的範圍，所以我們可以直接用之前的結果，$Z(j) = Z(j')$。
-  \item $j' + Z(j') > z$
+\SampleProblem[Codeforces 164C]{Machine Programming}{
+  你有 $n$ 個工作可以分配給 $k$ 個機器人，每個工作只能給一個機器人做，
+  而且第 $i$ 個工作必須從 $s_i$ 做到 $s_i + t_i - 1$ ，不能中斷，做完
+  了這個工作可以得到 $c_i$ 元。 問你最多可以賺到多少錢？
+}
+如果我們把每一天看做是一個點，且每個機器人對應到一單位的流量，那答案就呼之欲出了。
+假設每一天對應到 $v_1, v_2, \dots, v_m$ ，那對於工作 $i$ ，我們就建一條 $v_{s_i} \rightarrow 
+v_{s_i+t_i-1}$ 的邊，其流量為 $1$ ，也就是只能一個人來做，並且他的花費是 $-c_i$，表示如
+果做了這件事情就會賺 $c_i$ 元。之後每一天都建一個無限大流量，花費為 $0$ 的邊到下一天，
+表示機器人也可以什麼事都不做到下一天。之後建 $s \rightarrow v_1, v_{m} \rightarrow t$ 
+流量各為 $1$ 的邊， 最後求最小花費最大流即可。
 
-    \begin{figure}[H]
-    \begin{center}
-      \begin{tikzpicture}[scale=0.8, transform shape]
-        \draw[line width=0.5mm] 
-        (0, 0) -- (7, 0)
-        (0, -.3) -- (0, .3)
-        (2, -.2) -- (2, .2)
-        (3, -.2) -- (3, .2)
-        (7, -.3) -- (7, .3)
-        (6, -.2) -- (6, .2)
+\section{額外的問題}
+這邊我們在舉一些和最大流有關的一些有趣的問題。
 
-        (10, 0) -- (17, 0)
-        (10, -.3) -- (10, .3)
-        (17, -.3) -- (17, .3)
-        (11, -.2) -- (11, .2)
-        (12, -.2) -- (12, .2)
-        (13, -.2) -- (13, .2)
-        (16, -.2) -- (16, .2)
-        ;
-        \draw[line width=0.5mm]
-        [dashed] (7, 0) -- (8, 0)
-        (8, .2) -- (8, -.2)
-        ;
+\subsection{最大密度子圖}
+\SampleProblem[經典問題]{最大密度子圖}{
+給你一個圖 $G = (V, E)$ ，你要求一個 $G$ 的導出子圖 $H = (V', E')$ ，使得他的密度 $\rho = 
+\abs{E'} / \abs{V'}$ 最大。
+}
 
-        \draw[line width=0.4mm] 
-        (2, 1) -- (8, 1)
-        (2, .8) -- (2, 1.2)
-        (3, .8) -- (3, 1.2)
-        (7, .8) -- (7, 1.2)
-        (8, .8) -- (8, 1.2)
+通常對於這種要最大化一個分數的問題，第一個直覺就是二分搜答案。假設我們當前猜答案為 $k$ ，
+也就是我們變成在問，是否有一個導出子圖滿足
+\[ \frac{\abs{E'}}{\abs{V'}} \geq k \quad \Leftrightarrow \quad \abs{E'} \geq k \abs{V'} 
+  \quad \Leftrightarrow \quad \abs{E'} - k \abs{V'} \geq 0 \]
+這個等價於一個求最大值的問題
+\begin{equation}
+\max_{H = (V', E')} \abs{E'} - k \abs{V'} \geq 0
+\label{eq:dens1}
+\end{equation}
+注意到
+\[ \abs{E'} = \frac{1}{2} \sum_{v \in V'} \deg_H(v)  \]
+而
+\[ \deg_H(v) = \deg_G(v) - \sum_{\substack{u \notin H \\ (v, u) \in E}} 1 \]
+代回 \eqref{eq:dens1} 
+\begin{align*}
+  \max_{H = (V', E')} \abs{E'} - k \abs{V'} \geq 0 \; & \Leftrightarrow \;
+  \max_{H = (V', E')} \sum_{v \in V'} \frac{1}{2} \left( \deg_G(v) -
+      \sum_{\substack{u \notin H \\ (v, u) \in E}} 1 \right) - k \\
+    & \Leftrightarrow \; - \min_{H = (V', E')} \sum_{v \in V'} \left( \left(2k - \deg_G(v) \right) +
+      \sum_{\substack{u \notin H \\ (v, u) \in E}} 1 \right) \\
+\end{align*}
+有沒有發現這個變成了「分兩類問題」了？ 對於每一個點，選他的 cost 就是 $2k - \deg(v)$ ，
+而如果 $(v, u) \in E$，那麼選了 $v$ 卻不選 $v$ 要花額外 $1$ 的 cost。轉化成最小割後用
+最大流解即可。
 
-        (12, 1) -- (17, 1)
-        (12, .8) -- (12, 1.2)
-        (13, .8) -- (13, 1.2)
-        (16, .8) -- (16, 1.2)
-        (17, .8) -- (17, 1.2)
-        ;
+\subsection{最少互斥路徑覆蓋}
+\SampleProblem[經典問題]{Minimum disjoint path covering}{
+給你一個有向圖 $G = (V, E)$ ，你要用最少不相交的簡單路徑
+$P_i$ 把所有的點都蓋過。
+一個簡單路徑是一個點都沒有重複的路徑。兩個路徑不相交表示他們
+裡面沒有重複的點。
+}
 
-        \draw[line width=0.4mm, dashed]
-        (17, 0) -- (18, 0)
-        (18, -.2) -- (18, .2)
-        ;
-        \draw[latex-]
-        (6.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$z-1$};
-        \draw[latex-]
-        (2.5, 1.5) -- ++(0, 1) node[above, scale=1.2]{$j'$};
-        \draw[latex-]
-        (7.5, 1.5) -- ++(0, 1) node[above, scale=1.2, xshift=0.3cm]{$j' + Z(j') - 1$};
-        \draw[latex-]
-        (10.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$L$};
-        \draw[latex-]
-        (12.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$j$};
-        \draw[latex-]
-        (16.5, -.5) -- ++(0, -1) node[below, scale=1.2]{$R$};
-        \draw[latex-latex]
-        (7.5, -.5) |- (17.5, -2.4) -- (17.5, -.5);
-        \draw[thick]
-        (11.8, -2.2) -- (12.2, -2.6)
-        (12.2, -2.2) -- (11.8, -2.6)
-        ;
-      \end{tikzpicture}
-    \end{center}
-    \caption{}
-    \label{fig:}
-    \end{figure}
+一開始想這個問題可能會想把每個路徑對應到一個流。可是我們要
+最小化路徑數量，與「最大」流相悖。因此我們換個想法，先想一下
+不相交的路徑是什麼意思，其實就是每個點都只能恰屬於一條路徑而已，
+而對一個路徑 $v_1, v_2, \cdots, v_n$ 可以發現，每一個元素都有一個
+後繼，如 $\mathtt{next}(v_1) = v_2, \mathtt{next}(v_2) = v_3, \dots$，
+除了最後一個點以外。因此我們要做的事情其實就是把所有的點「配到」他的
+後繼 $\mathtt{next}(v)$，而路徑的數量就是沒有被配到的點數，所以要
+最少的路徑就是要匹配最多！現在做法就很明瞭了。對於每個點 $v_i$，構造
+$u_i, w_i$，而如果 $(v_i, v_j) \in E$ ，就建造 $u_i \rightarrow v_j$ 的
+邊，最後就是要求二分圖的最大匹配！
 
-    這個情況由 \eqref{eq:z-0} 我們會知道$A[j' + Z(j') - 1] \neq A[R+1]$，所以從$j$開始最長也只能匹配到$R$了，因此$Z(j) = R - j + 1$。
-
-  \item $j' + Z(j') = z$
-    最後一種情況雖然我們無法直接得出$Z(j)$，但我們至少會知道$Z(j) \geq Z(j')$，因此我們繼續從$R$下去匹配就可以了！
-\end{enumerate}
-
-仔細分析了之後我們可以知道，除非是第3種Case才需要計算。假設計算 $Z(j)$ 時用到了第3種Case，我們就把 $(L, R)$ 更新為 $(j, j+Z(j)-1)$，可以發現如這樣做$R$值只會一直增加，且增加次數不可能超過字串的長度，並且匹配的次數恰好就是$R$增加的次數，因此求出所有位置的$Z(i)$時間複雜度只需$\ord{N}$。
-
-
-不過這和字串匹配有什麼關係呢？假設我們要拿 $B$ 匹配 $A$ ，只要令 $C = B \phi A$，其中 $\phi$ 是從來沒有在 $A, B$ 間出現過的字元，這樣如果 $A[i, i+k-1] = B, \: k = \abs{B}$ ，必有 $C[k+i+1, 2k+i] = C[0, k-1]$ ， 也就是
-$ Z_C(k+i+1) = k $。
-
-除此之外 Z algorithm 還可以解決諸如最長回文子字串等等的問題，方法和這裡類似，就留給讀者思考了。
-\section{Suffix Array}
-Suffix Array 是解決字串問題中的一把很神秘的武器，乍看之下不知道他的用處何在，其實一大半的問題都可以用他來解決。這麼好用的東西一定要把他學起來！\\
-
-\begin{theorem}[定理]
-  對於一個字串$B$的兩個不同的後綴$S_B(i), S_B(j)$，必有$S_B(i) \neq S_B(j)$，即
-  \[ 
-    S_B(i) < S_B(j) \quad \text{or} \quad S_B(i) > S_B(j)
-  \]
-\end{theorem}
-這是理所當然的，因為後綴兩兩不等長。而後綴數組要做的事就是把他們的順序找出來。後綴的順序在最後會給我們許多非常有用的資訊！
-
-首先我們定義一些東西：
-\begin{theorem}[定義]
-  對於一個長度為$n$的字串$B$，令$S_B = \{ S_B(0), S_B(1), \cdots S_B(n-1)\}$為所有後綴的集合，定義
-  \begin{enumerate}
-    \item $\rank(i)$表示後綴$S_B(i)$在$S_B$中是字典序第幾小的(從$0$開始算)。
-    \item $\sa(i) = \rank^{-1}(i)$，也就是說第$i$小的後綴是哪一個。
-    \item $\hei(i) = x$代表$S_{B}(\sa(i))$跟$S_{B}(\sa(i-1))$前$k$個字元相同，也就是說如果$S_{B}(\sa(i)) = S_1, \: S_{B}(\sa(i-1)) = S_2$，則$S_1[0, k-1] = S_2[0, k-1]$。我們特別規定$\hei(0) = 0$。
-  \end{enumerate}
-\end{theorem}
-這邊一定不能搞混，$\rank(i)$表示``$i$是第幾名"，而$\sa(i)$表示``誰是第$i$名"，兩者互為反函數。舉個列子，對於字串 \texttt{"ABAABAAAB"} ：
-\begin{center}
-\begin{tabular}{c|c|c|l}
-  $i$ & $\sa$ & $\hei$ & Suffix \\\hline
-  0 & 5 & 0 & AAAB \\
-  1 & 6 & 2 & AAB \\
-  2 & 2 & 3 & AABAAAB \\
-  3 & 7 & 1 & AB \\
-  4 & 3 & 2 & ABAAAB \\
-  5 & 0 & 4 & ABAABAAAB \\
-  6 & 8 & 0 & B \\
-  7 & 4 & 1 & BAAAB \\
-  8 & 1 & 3 & BAABAAAB
-\end{tabular}
-\end{center}
-
-在學會如何使用 suffix array 以前，我們得先學會如何建造 suffix array 。而建造 suffix array 的演算法也很多種，最佳的時間複雜度為 $\ord{N}$ 。
-但原理複雜，因此這裡我們先介紹一種最基本的倍增算法，複雜度是 $\ord{N \log N } $，但在這之前我們需要一點先備知識。
-\begin{theorem}[定理]
-  如果$A[0, k-1] = B[0, k-1]$我們便寫作$A =_k B$，相同的道理我們可以定義$A <_k B$，則
-  \[ A < B  \quad \Rightarrow  \quad
-    \begin{dcases}
-      A <_k B &  \text{or} \\
-      A =_k B \; \land \; S_A(k) < S_B(k)  &
-    \end{dcases}
-  \]
-\end{theorem}
-其實就是說假定今天$A < B$，且$A = A_1A_2, B = B_1B_2, \; \abs{A_1} = \abs{B_1}$，那麼不是$A$在第一階段就比輸了$A_1 < B_1$，就是在第二階段才比輸， $A_1 = B_1 \text{ and } A_2 < B_2$。\\
-藉由這個性質，我們可以觀察到一件很重要的事情：如果我們已經知道所有後綴在只比較他們的前 $k$ 個字元時的大小關係，那麼我們其實可以快速的找出比較前 $2k$ 個字元時的大小關係，因為任何後綴的最後$k$個字元也是原本字串的某個後綴的前$k$個字元！因此倍增的做法便是
-\begin{enumerate}
-    \item 使用某種方法讓所有後綴依照第一個字元排好
-    \item 基於上方結果，讓所有後綴依照前 $2$ 個字元排好
-    \item 基於上方結果，讓所有後綴依照前 $4$ 個字元排好
-    \item ....
-    \item 基於上方結果，讓所有後綴依照前 $2^{\lceil\log_2 |A|\rceil}$ 個字元排好
-\end{enumerate}
-祥細的流程如下，定義$\rank_k(i)$表示依照前 $k$ 個字元排序時，比第$i$個後綴
-小的有幾個(也就是名次，只是相等的名次一樣)
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[mynode/.style=draw, minimum width=3cm, minimum height=1cm, align=left]
-    \node at (0, 0) [mynode] {先求出$\rank_1(i)$};
-    \node at (4.5, 0) [mynode] {用$(\rank_k(i), \rank_k(i+k))$\\排序得出$\sa_{2k}(i)$};
-    \node at (9.4, 0) [mynode] {利用$\sa_{2k}$求出$\rank_{2k}$};
-    \node at (7.2, 1.2) {總共$\ceil{\lg n}$次};
-    \draw[-latex, thick] (1.6, 0) -- ++(0.8, 0);
-    \draw[-latex, thick] (6.6, 0) -- ++(0.8, 0);
-    \draw[-latex, thick] (9.4, 0) ++ (0, 0.6) |- (4.5, 1.5) -- ++(0, -0.8);
-    \draw[-latex, thick] (11.5, 0) -- ++(1, 0);
-  \end{tikzpicture}
-  \caption{}
-  \label{fig:sa1}
-\end{figure}
-從 Figure~\ref{fig:sa1} 中我們知道瓶頸在排序$(\rank(i), \rank(i+k))$，假設一次的時間複雜度是$\ord{F}$，那總體的複雜度就是$\ord{\log(n) F}$。如果我們用一般的排序法$\ord{F} = \ord{n \log n}$，但因為我們要排的東西都是兩個$[0, n)$中的整數對，可以使用 Radix sort 加速到 $\ord{n}$ ，因此總共的複雜度就是  $\ord{n \log n}$了。
-
-最後我們只剩$\hei$要求了。複習一下$\hei$的定義，$\hei(i)$代表$S_{B}(\sa(i))$跟$S_{B}(\sa(i-1))$前幾個字元相同。我們先列出他的一些性質：
-\begin{theorem}[定理]
-  我們定義$d(A_1, A_2)$表示$A_1, A_2$的前幾個字元相同。對於一個長度為$n$的字串$B$有：
-  \begin{itemize}
-    \item 假設$\rank(i) < \rank(j)$，則 $ d(S_B(i), S_B(j)) = \min\limits_{\rank(i) < k \leq \rank(j)} \hei(k) $ \listeqn \label{eq:sa1}
-    \item 如果$\hei(\rank(i)) = k$，則字典序比 $S_B(i)$ 小的字串最多只會跟 $S_B(i)$ 前 $k$ 個字元一樣。 \listeqn \label{eq:sa2}
-    \item $\hei(\rank(i)) \geq \hei(\rank(i-1)) - 1$ \listeqn \label{eq:sa3}
-  \end{itemize}
-\end{theorem}
-其實按照字典序排序的結果就是，長的像的後綴會被排在一起！
-我們先證 \eqref{eq:sa1} ，假設$\rank(i) = k_1, \rank(j) = k_2$，注意到
-$\hei(k_2)$ 表示 $S_B(\sa(k_2)), S_B(\sa(k_2-1))$ 前幾個字元一樣，$\hei(k_2 - 1)$ 表示 $S_B(\sa(k_2 - 1)), S_B(\sa(k_2-2))$ 前幾個字元一樣...，一直到 $\hei(k_1 + 1)$ 表示 $S_B(\sa(k_1 + 1)), S_B(\sa(k_1))$ 前幾個字元一樣。但別忘了
-\[
-  S_B(\sa(k_1)) = S_B(\sa(\rank(i))) = S_B(i),\quad S_B(\sa(k_2)) = S_B(\sa(\rank(j))) = S_B(j)
-\]
-因此 $S_B(i), S_B(j)$ 至少前$h = \min_{k_1 < k \leq k_2} \hei(k)$個字元一樣！但 $h = \min_{k_1 < k \leq k_2} \hei(k)$，表示一定有一次 $S_B(\sa(k')) $ 和 $S_B(\sa(k'-1))$的第$h$個字元不一樣。而之後這第 $h$ 個字元也不可能一樣，因為我們是照字典序排序的，接下來只會越來越小！因此 \eqref{eq:sa1} 是對的！\\
-\eqref{eq:sa2} 是 \eqref{eq:sa1} 的一個直接的結果，而 \eqref{eq:sa3} 我們用圖來說明 \\
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[scale=0.8]
-    \fill[gray!30] (1, 0) rectangle (5, 1);
-    \fill[gray!30] (8, 0) rectangle (12, 1);
-    \draw[line width=0.8mm] (0, 0) rectangle (5, 1);
-    \draw[line width=0.8mm] (7, 0) rectangle (12, 1);
-    \draw (0, 0) rectangle (14, 1);
-    \draw[thick] (0, 0) rectangle (1, 1) coordinate[midway](v1);
-    \draw[thick] (1, 0) rectangle (2, 1);
-    \draw[thick] (7, 0) rectangle (8, 1) node[midway, yshift=-0.8cm] {$i-1$};
-    \draw[thick] (8, 0) rectangle (9, 1) node[midway, yshift=-0.8cm] {$i$};
-    \draw (0, 0) rectangle (14, 1);
-    \draw[decoration={brace, raise=1.5mm, amplitude=1.5mm}, decorate, thick] (0, 1) -- (5, 1)
-    node[midway, yshift=0.7cm] {$\hei(\rank(i-1))$};
-
-    \draw[decoration={brace, raise=1.5mm, amplitude=1.5mm}, decorate, thick] (8, 1) -- (12, 1)
-    node[midway, yshift=0.7cm] {$\hei(\rank(i-1)) - 1$}
-    ;
-
-    \draw[latex-] (v1) ++ (0, -0.7) -- ++(0, -0.6) node[below]{$\sa(\rank(i-1)-1)$};
-    
-  \end{tikzpicture}
-\caption{}
-\label{fig:sa2}
-\end{figure}
-
-如Figure~\ref{fig:sa2}，假設$\hei(\rank(i-1)) = k$，且不妨假設$k > 1$，也就是說$S_{B}(i-1)$和他照字典序排序後的前一號$j = \sa(\rank(i-1)-1)$的前$k$個字元一樣！則$S_B(j+1) < S_B(i)$因為$S[j] = S[i-1]$，且$S_B(j+1)$至少會和$S_B(i)$有$k-1$個字元一樣。由\eqref{eq:sa2}我們得知
-\[
-  \hei(\rank(i)) \geq k - 1 = \hei(\rank(i-1)) - 1 
-\]
-
-\subsection{Suffix Array 之應用}
-第一個 Suffix Array 主要的應用是處理匹配問題，而且他往往比前面介紹的演算法更有彈性！ 
-
-我們用 $B$ 去匹配 $A$ 其實就是在問 $B$ 是不是 $A$ 的一個子字串。 注意到一個子字串又一定是某個後綴的前綴，所以我們要做的事情就是找出 $A$ 和 $B$ 最像的後綴，也就是{\bf 問如果我們將$A$的後綴排序好後， $B$ 在其中的哪個位置？}而排序的部分剛好就是Suffix Array 做的事情。 而找出 $B$ 在其中的位置，很顯然會想到二分搜。 這樣的確只需要比較 $\ord{n \log n}$ 次，不過因為後綴的長度可以到 $\ord{n}$ ，所以整體下來會是 $\ord{n \log n}$。
-
-一個優化是，假設我們已經將 $B$ 和一個 $A$ 的後綴 $S_A(i)$ 匹配了前 $k$ 個字元， 現在我們要匹配另一個後綴 $S_A(i')$ ， 注意到如果 $B$ 可以和 $S_A(i')$ 匹配超過 $k$ 個字元，那麼 $S_A(i), S_A(i')$ 至少要前 $k$ 個字元相同 (更甚者，要恰好前 $k$ 個字元相同)。也就是 $d(S_A(i), S_A(i')) \geq k$。於是 \eqref{eq:sa1} 告訴了我們
-\[ d(S_A(i), S_A(i')) = \min\limits_{\rank_A(i) < k \leq \rank(i')} \hei(k) \]
-這其是一個RMQ問題，如果我們用如{\bf 線段樹}等資料結構加速，每一次的查詢只需要 $\ord{\log n}$  甚至 $\ord{1}$ \footnote{ 因為我們不需修改操作，其實 RMQ 是可以做到 $\ord{1}$ 的，當然，不是很好實做。 }。
-而如果查詢的結果是 $d(S_A(i), S_A(i')) < k$ ，我們就不需要在重新匹配了，而如果 $d(S_A(i), S_A(i')) = k$ 時我們直接繼續從第 $k$ 個字元匹配。 這樣成功匹配的數量(也差不多會是匹配的次數) 永遠只會增加， 因此匹配的次數不會超過 $\ord{\abs{B}}$ ， 全部的複雜度會是 $\ord{ \abs{A} \log \abs{A} + \abs{B} }$。
-
-第二個應用可以處理字串中的計數問題，我們先考慮一個最基本的問題
-\SampleProblem[經典問題]{不同的子字串數}{ 給你一個字串 $A$ ，問$A$不同的子字串有幾個。比如 $A = \str{abab}$，不同的子字串有 $\str{a}, \str{b}, \str{ab}, \str{ba}, \str{aba}, \str{bab}, \str{abab}$，共 $7$ 種。}
-這邊還是用到一個子字串一定是一個後綴的前綴。如果一個子字串出現在多個後綴，我們在字典序最小的後綴計算，你會發現，$\hei(i)$就會剛好是$\rank(i)$的後綴的前綴中，有多少已經在字典序比他小的後綴出現過。因此
-\[ {n \choose 2} - \sum_{i=1}^{n-1} \hei(i) , \quad \text{where } n = \abs{A} \]
-恰好就是答案。
-
-\section{Suffix Automaton*}
-後綴字動機 (Suffix Automaton) 是現在很熱門的一個後綴結構。雖然大部分 Suffix Automaton 可以做到的事情 Suffix Array 也可以做到，但其程式碼精簡，不失為另一個不錯的解題武器。
-
-\begin{theorem}[定義]
-  一個字串$B$的後綴自動機是一個自動機，他接受一個字串$s$若且唯若$s$是$B$的一個後綴。
-\end{theorem}
-如下圖 \ref{fig:sam1} 就是字串$\str{abcbc}$的後綴自動機。
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[>=latex, node distance=2cm, auto]
-    \tikzstyle{accepting}=[fill=gray!20, double=gray!20, double distance = 1.5pt]
-    \node[state, initial] (q0) {};
-    \node[state] (q1) [right of=q0]{};
-    \node[state] (q2) [right of=q1]{};
-    \node[state] (q3) [right of=q2]{};
-    \node[state] (q4) [right of=q3]{};
-    \node[state, accepting] (q5) [right of=q4]{};
-    \node[state] (q6) [above right of=q1, yshift=1cm, xshift=-1cm]{};
-    \node[state, accepting] (q7) [right of=q6, xshift=1cm]{};
-    \path[->]
-    (q0) edge [swap] node {a} (q1)
-    (q1) edge [swap] node {b} (q2)
-    (q2) edge [swap] node {c} (q3)
-    (q3) edge [swap] node {b} (q4)
-    (q4) edge [swap] node {c} (q5)
-    (q0) edge        node {b} (q6)
-    (q0) edge        node {c} (q7)
-    (q6) edge        node {c} (q7)
-    (q7) edge        node {b} (q4)
-    ;
-  \end{tikzpicture}
-\caption{}
-\label{fig:sam1}
-\end{figure}
-至於如何構造？最基本的想法就是把所有$B$的{\bf 子字串}都當作自動機上的一個 state，然後一個一個 state 慢慢建邊。這樣當然正確性是被保證的(畢竟所有後綴的前綴一定是原字串的一個子字串)，但這樣 state 有 $\ord{N^2}$ 個，需要再改進。\\
-而減少 state 的唯一方法就是把等價的 state 合併。像 Figure~\ref{fig:sam1} 中 state 數量也只有 $8$ 個而非 ${6 \choose 2} = 15$ 個那麼多，觀察後可以發現在圖中 $\str{abcb},\str{bcb},\str{cb}$ 三個字串是屬於同一個 state 的！\\
-仔細思考一陣後可以發現，只要結束位置相同的兩個子字串，他們的 state 就會是等價的，我們便可以將之合併！我們先定義結束集合
-
-\begin{theorem}[定義]
-  給定兩個字串$B, T$，我們定義$T$在$B$上的結束集合$\edps_B(T)$為
-  \[
-    \edps_B(T) = \{ i ~:  B[ i - \abs{T} + 1 , i ] = T \}
-  \]
-\end{theorem}
-比如說對$\str{abcbc}$而言，$\edps(\str{bc}) = \{2, 4\}$，因為$\str{bc}$在字串中出現兩次並且分別在位置$2, 4$結束。
-
-\begin{theorem}[定理]
-  給定兩個字串$T_1, T_2$，如果$\edps_B(T_1) = \edps_B(T_2)$，記作$T_1 \equiv_B T_2$，則
-  \begin{itemize}
-    \item 對任何字串$A$，$\edps_B(T_1 A) = \edps_B(T_2 A)$，也就是$T_1 A \equiv_B T_2 A$ \listeqn \label{eq:sam1}
-    \item 對任何字串$A$，如果$T_1 A$是$B$的後綴，則$T_2 A$也是$B$的後綴 \listeqn \label{eq:sam2}
-  \end{itemize}
-\end{theorem}
-
-\eqref{eq:sam1} 稍為推敲即可得出，而 \eqref{eq:sam2} 是前者的一個直接推論，並且 \eqref{eq:sam2} 也告訴我們，只要 $T_1 \equiv_B T_2$，他們的確可以看作是等價的 state ！如在前面的例子，$\edps(\str{bc}) = \{2, 4\} = \edps(\str{c})$，而他們在 Figure~\ref{fig:sam1} 上也的確會走到同一個 state 。\\
-但這樣可以幫我們省下多少 state 呢？ 我們還需要$\edps$的一個很重要的性質：
-
-\begin{theorem}[定理]
-  給定兩個字串$T_1, T_2$，$\abs{T_1} < \abs{T_2}$，那麼不是
-  $ \edps(T_1) \cap \edps(T_2) = \varnothing $，就是
-  $ \edps(T_1) \supset \edps(T_2) $。並且如果是後者，$T_1$會是$T_2$的一個後綴。 \listeqn
-\end{theorem} 
-事實上從這個定理我們就可以知道state的數量最多只會有 $2n - 1$ 個。我們在這邊整理一下：\\
-
-\begin{theorem}[定理]
-  我們可以用 $\equiv_B$ 將 $B$ 的所有子字串分類，也就是$T_1, T_2$被分在同一類若且唯若 $T_1 \equiv_B T_2$ 。假設我們將 $B$ 的所有子字串分成 $\alpha_1, \alpha_2 , \cdots , \alpha_k$，則
-  \begin{itemize}
-    \item 如果$t_1, t_2 \in \alpha_i$，則必有其中一個為另一個的後綴。 \listeqn \label{eq:sam3}
-    \item $k$ 恰好是後綴自動機上非起始節點的數量，每一個$\alpha_i$可以看做是後綴自動機上的一個 state 。
-    \item $k < 2 |B| - 1$。
-  \end{itemize}
-\end{theorem}
-
-在後綴自動機還有一個很重要的指標，Fail link $\flk$。假設一個字串 $T_0$ 是 $B$ 的子字串，那我們如果不斷把 $T_0$ 的第一個字串去掉變成 $T_1, T_2, \cdots$，那一開始結束集合可能不變，但總會有一個 $T_k$ 結束集合開始改變了。 比如說 $B = \str{ababa}$ ， $\str{abab}, \str{bab}$ 的結束集合都是 $\{ 4 \}$ ，但 $\str{ab}$ 的結束集合變成 $\{ 2, 4 \}$ 了。\\
-假設 $T_0$ 所屬的集合稱作 $\alpha_1$ ， $T_k$ 所屬的集合稱作 $\alpha_2$ ，則令 $\flk(\alpha_1) = \alpha_2$。
-
-\begin{theorem}[定理]
-  我們定義 $\edps(\alpha_i) = \edps(t_1)$，對於任意一個 $t_i \in \alpha_i$。(反正任何一個的結束集合都一樣)。\\
-  定義 $\max(\alpha_i), \min(\alpha_i)$為$\alpha_i$裡最長/短的字串(因為 \eqref{eq:sam3} 所以恰好只會有一個)。\\
-  我們用$\alpha(t)$來表示字串$t$所屬的集合，如果$s_i = \min(\alpha_i)$，我們定義
-  \[
-    \flk(\alpha_i) = \alpha(S_{s_i}(1))
-  \]
-  也就是把$s_i$的第一個字元去掉後所屬的類別。
-\end{theorem}
-
-現在我們要考慮怎麼樣把這一個後綴自動機建出來。一個做法是我們從空字串開始，一個一個字元慢慢加上去。因為$\alpha_i$就是後綴自動機上的點，所以我們要先了解$\edps(t)$會怎麼變動。
-\begin{theorem}[定理]
-  給定$B$，現在如果在$B$的後面加一個字元$c$使得$B' = Bc$，則如果$T$是$B$的一個子字串，有
-  \begin{itemize}
-    \item 如果$T$不是$B'$的一個後綴，那$\edps_{B'}(T) = \edps_B(T)$。
-    \item 如果$T$是$B'$的一個後綴，那$\edps_{B'}(T) = \edps_B(T) \cap \{n\}$，其中$n = \abs{B} = \abs{B'} - 1$。
-  \end{itemize}
-\end{theorem}
-這個定理告訴我們，在一個字串後面加一個字元，結束集合不會有太大的變動！會變的只有$B'$的後綴，不超過$n$個，而且分在同一類的可以一起處理！現在的問題就只有{\bf 怎麼找出所有後綴存在的集合了}。這時候就可以好好利用 $\flk$ 了！
-
-\begin{theorem}[定理]
-  給定一個字串$B$，$B'$ 為在 $B$ 後面加一個字元 $c$ 所成的字串， 即 $B' = B c $ 。
-  \begin{itemize}
-    \item 假設 $T'$ 是 $B'$ 的後綴， 則 $B = Tc$，其中 $T$ 是 $B$ 的後綴。
-      \listeqn  \label{eq:bc1}
-    \item 令 $\beta_0 = \alpha(B)$ ， 也就是整個字串 $B$ 所屬的集合，如果  $\flk(\beta_i) = \beta_{i+1}$ ， 則所有 $B$ 的後綴都會在 $\{ \beta_0, \beta_1, \cdots, \beta_h \}$的其中一個。 \listeqn \label{eq:bc2}
-  \end{itemize}
-\end{theorem}
-
-將 \eqref{eq:bc1} 和 \eqref{eq:bc2} 合起來用，我們就得出一個找到 $B'$ 所有後綴的方法了！ 我們只要檢查 $\{ \beta_0, \beta_1, \cdots \}$ 有沒有連出 $c$ 的邊，有的話所有那些點就是 $B'$ 的後綴了。最後我們只要考慮這些點的結束位置會怎麼變就可以了。
-
-\begin{theorem}[定理]
-  給定一個字串$B$：%
-  \begin{itemize}
-    \item 現在如果在$B$的後面加一個字元$c$使得$B' = Bc$，則如果$T$是$B'$的後綴，且$T$是$B$的子字串，那$T$的所有後綴也是$B$的子字串。     
-    \item 存在$k$使得所有$j \geq k$，$S_B(j) c$，也就是在$S_B(j)$後面加一個字元$c$，都是$B$的子字串。而所有$j < k$，$S_B(j) c$都不是$B$的子字串。\listeqn \label{eq:bc3}
-  \end{itemize}
-\end{theorem}
-也就是說會有一個臨界的後綴$S = S_B(k)$，使得比他短的後綴加上 $c$ 後，會是原本 $B$ 的子字串。不妨設 $m = \abs{S}$。令 $\beta_k$ 是第一個有連出 $c$ 的邊的點，由 \eqref{eq:bc3} 我們知道 $\beta_i$ 有連出 $c$ 的邊若且唯若 $i \geq k$。因此可令 $\gamma_i = \beta_i c$，也就是從$\beta_i$連出 $c$ 的邊走到的點。我們現在只要考慮 $\edps(\gamma_i)$，會怎麼變化就可以了！有兩種情形
-
-
-\begin{enumerate}[label=Case \arabic*. ]
-  \item $\abs{\max(\gamma_i)} = \abs{\max(\beta_i)} + 1$，假設 $\max(\beta_i) = T, \max(\gamma_i) = U$，這代表 $Tc = U$ ，而 $\gamma_i$ 裡的字串都是$U$ 的後綴，也就是 {\bf 所有 $\gamma_i$ 中的字串都是 $B' = Bc$ 的後綴}！因此他們的結束位置都全部加一個 $n$，同時改變，不需要分家了。
-  \item $\abs{\max(\gamma_i)} > \abs{\max(\beta_i)} + 1$，與前面的 Case 相反，這表示 {\bf 並非所有 $\gamma_i$ 中的字串都是 $B' = Bc$ 的後綴}！這時我們勢必得把 $\gamma_i$ 拆成兩個新的點 $\gamma_{i1}, \gamma_{i2}$ 了。
-\end{enumerate}
-
-因此我們必需維護兩個東西，$\flk(\alpha_i)$ 和 $\mx(\alpha_i) = \abs{\max(\alpha_i)}$。
-如果你仔細考慮每個 Case 這兩者該如何變化，可以得出以下構造後綴自動機的演算法：\\
-我們從一個只有 initial state $\alpha_0$ 的自動機開始，每個點維護$\flk(\alpha_i), \mx(\alpha_i) = \abs{\max(\alpha_i)}$，並且記好結束的 state $e$ 是哪一個(一開始$e = \alpha_0$)，逐一插入字元。假設這一次插入的字元為 $c$ ：
-\begin{enumerate}
-  \item 加入一個新點 $\alpha_{k+1}$
-  \item 從$e$開始，令$u = e$。看看 $u$ 有沒有 $c$ 的出去的邊，如果沒有，則加一條 $c$ 從 $u \rightarrow \alpha_{k+1}$的邊。 令 $u \leftarrow \flk(u)$ 繼續嘗試，直到有或者 $u = \alpha_0$為止。
-  \item 如果$u$沒有 $c$ 連出去的邊，則$u = \alpha_0$，加一條 $c$ 從 $\alpha_0 \rightarrow \alpha_{k+1}$並令$\flk(\alpha_{k+1}) = \alpha_0$後結束。
-  \item  現在假設$u$ 從 $c$ 連出去的邊到 $v$。
-  \item 如果$\mx(v) = \mx(u) + 1$，(Case 1.)則讓$\flk(\alpha_{k+1}) = v$，結束。
-  \item 如果$\mx(v) \neq \mx(u) + 1$，(Case 2.)我們需要把$v$拆成兩個點。因此我們複製一個點$v'$使得
-    \begin{itemize}
-      \item $v'$要保持$v$的所有向外的邊。
-      \item $\flk(v') \leftarrow \flk(v), \quad \flk(v), \flk(\alpha_{k+1}) \leftarrow v'$。
-      \item 所有$u$往$\flk(u)$走到的節點如果有邊指向$v$要改指到$v'$。因此我們不段令$u \leftarrow \flk(u)$去檢查，直到$u = \alpha_0$為止。
-    \end{itemize}
-\end{enumerate}
-最後更新$e = \alpha_{k+1}$，增加$k$後重複步驟直到建完整個字串。\\
-以下是一個 Suffix Automaton 的範例程式碼：
-Suffix Automata 的應用非常多，從匹配到計數等等。另外 Suffix Automata 有一個很重要的性質：
-\begin{theorem}[定理]
-  一個 $B$ 的後綴自動機上從起始點 $s$ 到任何一點 $v$ 的任何一條路徑都恰好對應到一個 $B$ 的子字串。
-\end{theorem}
-因此會有各種在 Suffix Automata 上 DP 的花招，就留給讀者自行探討了。
 
 \section{習題}
 
@@ -1122,5 +661,5 @@ Suffix Automata 的應用非常多，從匹配到計數等等。另外 Suffix Au
       \end{enumerate}
     } $\cons{ \abs{A} \leq 10^5}$
   \section{Special Thanks}
-  此分講義部分參考自去年的講義，特別感謝去年的編輯者。
+  此分講義部分參考自前年的講義，特別感謝前年的編輯者。
 \end{document}
