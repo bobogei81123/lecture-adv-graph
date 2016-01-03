@@ -221,6 +221,39 @@ c(v, u) - f(v, u) = 0 - (- f(u, v)) = 3$ 。
   \end{enumerate}
 \end{theorem}
 
+\subsection{Max-flow min-cut theorem 的證明*}
+\begin{proof}
+  (1) $\Rightarrow$ (2) ，由上面的討論可知如果 $G_f$ 有一條 $s$ 到 $t$ 的擴充
+  路徑，就可沿著這條路徑擴充增加流量，因此 $G_f$ 沒有擴充路徑。 
+  
+  (2) $\Rightarrow$ (3) ，我們要先證明一個引理
+\begin{lemma}
+  對於一個流量 $f$，定義一個 s-t cut $(S, T)$ 的截流為
+  \[ \abs{f(S, T)} = \sum_{u \in S, v \in T} f(u, v) \]
+  則 $\abs{f(S, T)} = \abs{f}$ 。
+\end{lemma}
+\begin{proof}
+  注意到 $\sum\limits_{u, v \in A} f(u, v) = 0$，因為 $f(u, v) = -f(v, u)$，
+  且由點的流量守恆，\\$\sum\limits_{v \in V} f(u, v) = 0, \; \forall u$，因此
+  \vspace*{-.5cm}\begin{align*}
+    \abs{f(S, T)} &= \sum_{u \in S, v \in T} f(u, v) 
+    = \sum_{u \in S, v \in T \cup S} f(u, v) \\
+    &= \sum_{u \in S \setminus \{s\}, v \in V} f(u, v)
+     + \sum_{v \in V} f(s, v) \\
+     &= 0 + \abs{f} = \abs{f} 
+  \end{align*} 
+\end{proof}
+現在我們回來證明原來的問題，我們{\bf 令 $S$ 表示所有可以從 $s$ 經由 $G_f$ 上的邊}%
+走到的點，$T = V \setminus S$ ，則 $(S, T)$ 是一個 s-t cut，因為 $s \in S$ 且
+由 $G_f$ 沒有 $s$ 到 $t$ 的擴充路徑可以知道 $t \in T$ 。由引理我們可以知道
+$\abs{f(S, T)} = \abs{f}$，而因為剩餘網路沒有從 $S$ 到 $T$ 的邊了，可以知道
+原本圖上 $S$ 到 $T$ 的邊都以經流滿了，因此 $\abs{f} = \abs{f(S, T)} = \abs{C}$。
+
+而在由引理我們知道對於任何一個割 $C$，$C \geq \abs{f}$，因此剛剛我們討論的
+$(S, T)$的確是最小割了，這也順便證明了 (3) $\Rightarrow$ (1)。
+\end{proof}
+
+
 \subsection{Ford–Fulkerson algorithm}
 之前以經說過，就算忘了 Max-flow min-cut theorem 再提醒了我們一次
 只要不斷在剩餘網路中找 $s \leadsto t$ 的擴充路徑增加流量，
@@ -292,6 +325,90 @@ Edmonds-Karp algorithm 是 Ford-Fulkerson algorithm 的一個小改進，他的
 
 令人意外的，加上了這個優化之後，可以證明最多只會找 $\ord{VE}$ 次擴充路徑，
 不論流量是不是無理數！有時候一個小小的優化也可以造成很大的改變。
+
+\subsubsection{Edmonds-Karp algorithm 的證明*}
+\begin{definition}
+  我們定義 $d(u)$ 表示一個點到 $t$ 的最短距離。
+\end{definition}
+\begin{theorem}
+  Edmonds-Karp 最多只會進行 $\ord{VE}$ 次擴充。
+\end{theorem}
+\begin{proof}
+我們先證明一些引理：
+\begin{lemma}
+  在 Edmonds-Karp 的演算法中，也就是如果每次都找最短路擴充，
+  則 $d(u)$ 永遠不會減少。
+\end{lemma}
+\begin{proof}
+  可以知道擴充路徑上的邊都是重邊。
+
+  假設經過一次擴充，流量從 $f$ 變成 $f'$，而某個 $d_f(u)$ 減少成了 $d_{f'}(u)$，
+  找 $d_{f'}(u)$ 最少的那一個 $u$。且令 $G_{f'}$ 中到 $u$ 的最短路是
+  $s \leadsto v \rightarrow u$，也就是說 $d_{f'}(v) = d_{f'}(u) - 1$，由 $u$
+  的挑選我們知道 $d_{f'}(v)$ 沒有減少，也就是 $d_{f'}(v) \geq d_f(v)$。
+  我們宣稱 $(v, u) \notin E(G_f)$，否則
+  \[ d_f(u) \leq d_f(v) + 1 \leq d_{f'}(v) + 1 = d_{f'}(u) < d_f(u), \quad \contradict\]
+  所以 $(v, u) \notin E(G_f)$，但 $(v, u) \in E(G_{f'})$，因此擴充的路徑一定有 $(u, v)$
+  ，但
+  \[ d_f(u) = d_f(v) - 1 \leq d_{f'}(v) - 1 = d_{f'}(u) - 2 < d_f(u) - 2, \quad \contradict\]
+    固 $d(u)$ 永遠不會減少。
+\end{proof}
+\clearpage
+\begin{definition}
+  一個邊 $(u, v)$ 是{\bf 重邊}表示他是在擴充路徑上剩餘流量最小的一條。
+\end{definition}
+\begin{lemma}
+  \pass
+  \begin{enumerate}
+    \item 在 Edmonds-Karp 的演算法中，每次擴充至少會有一條重邊。
+    \item 每個邊最多成為 $\ord{V}$ 次重邊。
+  \end{enumerate}
+\end{lemma}
+\begin{proof} (1) 是顯然的。
+  
+  假設在一次擴充，$(u, v)$ 是重邊，表示在擴充前 $d_f(v) = d_f(u) + 1$，
+  那經過這次擴充後，因為擴充的量正好就是 $(u, v)$ 的剩餘流量，
+  所以 $(u, v) \notin G_{f'}$。而 $(u, v)$ 要再一次成為重邊前，一定要從
+  $(v, u)$ 擴充過，否則 $(u, v)$ 不會在剩餘網路裡。在 $(v, u)$ 的
+  那次擴充，有
+  \[ d'(u) = d'(v) + 1 \geq d_f(v) + 1 = d_f(u) + 2 \]
+  也就是在下一次 $(u, v)$ 成為重邊後，$d(u)$ 至少增加了 $2$ ，注意到
+  $d(u) > \abs{V}$ 就表示 $v$ 連不到 $t$ 了，所以 $(u, v)$ 至多成為
+  重邊 $\abs{V} / 2 = \ord{V}$ 次。
+\end{proof}
+由上一個引理知道一個邊最多成為重邊 $\ord{V}$ 次，而每次擴充都要有一個
+重邊，因此擴充的次數不會超過 $\ord{VE}$ 次，整體的複雜度就是 $\ord{VE^2}$。
+\end{proof}
+
+\subsection{Dinic's algorithm *}
+Dinic 是 Edmonds 的一個優化，時間複雜度是 $\ord{V^2 E}$，他的想法其實很
+簡單。
+
+剛剛我們證明了 $d(u)$ 永遠不會減少，也就是最短路只會越來越長，因此我們
+甘脆一次把長度 $1$ 的擴充路徑擴充完，再把長度 $2$ 的擴充路徑全部擴充…
+一直到最後把長度 $\abs{V} - 1$ 的路徑擴充完，我們就找到最大流了。
+
+具體的做法是這樣的，我們先求出所有點與 $s$ 的距離 $d(u)$ ，假設我們
+現在在進行長度為 $k$ 的擴充。對於每一個點 $u$ ，我們定義 $N_u = 
+\{ v: d(v) = d(u) + 1 \}$，也就是如果 $(u, v)$ 在擴充路徑上，$v$ 一
+定在這個集合內。 
+
+現在我們要找一條擴充路徑，我們就從 $s$ 開始 DFS，假設我們 DFS 到了
+$u$ 這個點，令 $N_u = \{ n_u(1), n_u(2), \cdots, \}$，我們就先試
+$n_u(1)$，如果這個點可以走到 $t$，那我們就找到一條擴充路徑了，
+否則我們就在試 $n_u(2)$。{\bf 關鍵在於如果 $n_u(m)$ 試過了沒有成功，
+下次就不用在試了，從 $n_u(m+1)$ 開始試就可以了。}也就是我們把 $m(u)$
+記下來，代表下次我們 DFS 到這個點，下一個點從哪裡開始試就可以了。
+
+這樣的複雜度是多少呢？注意到每個點要試的下一個點不超過 $\deg(u)$，因
+此全部人要試的選擇不超過 $\ord{E}$，令外每一次擴充一定會「毀掉」至少
+一條邊(也就是擴充路徑上剩餘流量最少的那一條)，也就是一定有一個人的
+$m(u)$ 會增加，所以至多擴充 $\ord{E}$ 次。而每一次擴充的路徑長是 $\ord{k}$，
+因此擴充完一個長度的擴充路徑要 $\ord{kE}$，總複雜度是
+\[ \sum_{k = 1}^{\abs{V}-1} \ord{kE} = \ord{V^2 E}. \] 
+
+%，我們就把點分成 $k$ 個集合，$D_1, D_2, \cdots, D_k$，
+%其中 $D_i = \{ v: d(v) = i \}$ 。
 
 \section{最大流模型}
 知道了如何解最大流問題之後，我們就可以開始解一些題目了。

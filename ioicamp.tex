@@ -423,7 +423,7 @@
 
 \usepackage{array}
 %\usepackage{amsthm}
-\usepackage{ntheorem}
+\usepackage[amsmath,amsthm,thmmarks]{ntheorem}
 \usepackage{mathdots}
 
 \makeatletter
@@ -472,8 +472,31 @@
 %%%
 \usepackage{listings}
 \usepackage{fancyvrb}
-\usepackage{float}
+\usepackage{float,amssymb}
 \usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{automata}
+\newtheoremstyle{simpletheoremstyle}% 自定義Style
+{\item[\hskip\labelsep  {\bf ##1}]}{}%       上下間距
+\theoremstyle{simpletheoremstyle}
+\newmdtheoremenv[%
+	backgroundcolor=black!5,%
+	ntheorem=true,%
+  font=\Kai\mathversion{mymath},%
+  leftline=false,topline=false,rightline=false,bottomline=false
+  ]{lemma}{引理}[chapter]
+\newmdtheoremenv[%
+	backgroundcolor=black!5,%
+	ntheorem=true,%
+  font=\Kai\mathversion{mymath},%
+  leftline=false,topline=false,rightline=false,bottomline=false
+  ]{definition}{定義}
+\newtheoremstyle{simpletheoremstyle2}% 自定義Style
+{\item[\hskip\labelsep  {\it ##1}] \LiHeiPro}{}%       上下間距
+\theoremstyle{simpletheoremstyle2}
+\newtheorem{proof}{Proof.}
+\theoremstyle{customthm}
+%\newcommand*{\qed}{\hfill\ensuremath{\blacksquare}}
+\newcommand{\contradict}{\ensuremath{\Rightarrow\hspace*{-1pt}\Leftarrow}}
+\newcommand{\pass}{\mbox{}\vspace*{-10pt}}
 
 \usepackage{wasysym} % add by seanwu
