@@ -32,18 +32,77 @@
 
 \NewChapter{進階圖論}{Advanced Graph Theory} 
 
-\begin{comment}
-- 
-- 凡走過必留下痕跡
-- 字串中的規模經濟
-- 雜湊的力量
-- 統一場論
-- 更多有趣的貓貓蟲
-\end{comment}
+\section{圖的種類}
+\subsection{平面圖}
+{\bf 平面圖}就是可以畫在平面上的圖，使得任兩個邊只會在點上相交而已。
 
+而平面圖有一個很重要的定理。
+\begin{theorem}[定理 (歐拉定理)]
+  對於一個{\bf 連通}的平面圖，有
+  \begin{equation}
+    E = V + F - 2 \label{eq:planar-euler}
+  \end{equation}
+  其中 $E, V, F$ 分別代表圖的邊數、點數還有面數。
+  一個{\bf 面}定義為被邊所切出的一個區域(包含最外面的無限區域)。
+\end{theorem}
+歐拉公式給出了平面圖邊和點的關係式。而從公式中也可以看出平面圖邊的個數
+不會太多！事實上對於一個簡單的平面圖，有以下定理：
+\begin{theorem}[定理]
+  對於一個{\bf 簡單連通}的平面圖，如果 $\abs{V} \geq 3$ 則有
+  \begin{equation}
+    \abs{E} \leq 3\abs{V} - 6 \label{eq:planar-2}
+  \end{equation}
+\end{theorem}
+\begin{proof}
+  由 \eqref{eq:planar-euler}，$\abs{E} = \abs{V} + \abs{F} - 2$。
+  但簡單圖沒有自環及重邊，一個面一定至少有三條邊， $\abs{F} \geq 3 \abs{E}$。
+  代入 \eqref{eq:planar-euler} 得 $\abs{E} \leq 3 \abs{V} - 6$。
+\end{proof}
 
-\section{什麼是字串？}
-字串顧名思義，就是一個字元的串列。比如``Wrong answer at test case \#3"，``你今天穿的真是夠勁"之類的。字串是人類傳遞資訊的單位，因此也衍生出了許許多多的問題，當然也成為競賽領域中相當重要的一門！因此，本章將帶領大家領略字串的許多基本精神，替各位打下更上層樓的基礎。 \\
+邊很少的這個條件往往是解題的關鍵！
+
+\SampleProblem[NTUJ 2126]{Defense Your Country}{%
+  給你一個平面圖，請找一個最大團，也就是
+  最大的一個完全子圖。 ($\abs{V} \leq 2 \cdot 10^5$)
+}
+一看這個題目，不得了，連 $\abs{E}$ 都沒有給，但不要忘了由 \eqref{eq:planar-2}
+邊的數量不會超過 $3$ 倍的 $\abs{V}$。 
+
+但最大團是個 $\NPC$ 問題，如果我們不善用平面圖的性質，肯定解不出來。
+注意到 {\bf 平面圖的子圖仍是平面圖}，而完全圖的邊的數量 
+$\ord{E} = \ord{V^2}$，平面圖的是 $\ord{E} = \ord{V}$。
+肯定{\bf 有個上界 $m$，$K_m$ 絕對不會出現在平面圖上}。
+事實上算一下會發現對於 $K_5$，邊有 $10$ 條，點有 $5$ 個，而
+$10 > 3 \cdot 5 - 6 = 9$，所以根據 \eqref{eq:planar-2} $K_5$ 肯定不是平面圖
+！因此平面圖的最大團一定不超過 $4$。
+
+不過這題還沒有結束，雖然我們只要檢查 $4$ 個點以下的完全圖，但還是
+要有一個有效率的方法，否則 $\ord{V^4}$ 枚舉肯定要超時。再注意到
+\eqref{eq:planar-2} 其實告訴了
+\[ \sum \deg(v) = 2E \leq 6V - 12.\]
+因此 $\deg(v)$ 的平均值小於 $6$ ，也就是一定有一個點的度數小於 $5$，
+所以我們可以先找一個 $v_1$ 使得 $\deg(v_1) \leq 5$ ，然後 $2^6$ 枚舉
+他和他的鄰居的最大團就可以了。枚舉完了這個點，將這個點從圖上移除，
+新的圖仍是一個平面圖，因此我們又可以再找一個 $v_2$ 使得
+$\deg(v_2) \leq 5$。一路做下去我們就得到了一個 $\ord{V}$ 的做法！
+
+這裡再總結一下平面圖的一些結論。
+
+\begin{theorem}[定理]
+  定義一個圖的 degeneracy 為 $\min \deg(v)$，則平面圖的 degeneracy $\leq 5$。
+\end{theorem}
+
+\begin{theorem}[定理]
+  一個圖是平面圖的條件若且唯若 $K_5, K_{3, 3}$ 不是他的 minor。
+  $G$ 是 $H$ 的 minor 表示 $G$ 可以由
+  \begin{itemize}
+    \item 刪掉一條邊
+    \item 刪掉一個點
+    \item 收縮一條邊，也就是把兩個點合併。
+  \end{itemize}
+  得到。
+\end{theorem}
+
 
 首先我們定義什麼是字串。
 \begin{theorem}[定義]

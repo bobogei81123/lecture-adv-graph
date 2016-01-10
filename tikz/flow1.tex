@@ -40,7 +40,7 @@
     \node[vertex] (\lab) at (\x, \y) {\name};
   }
   \begin{scope}[every edge/.append style={pos=.5}]
-    \foreach \u/\v/\f/\ff/\style in {
+    \foreach \u/\v/\f/\ff/\style in {%
       s/v2/4/3/{sloped, above},
       s/v4/6/4/{left},
       s/v3/1/1/{sloped, above},
