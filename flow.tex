@@ -74,7 +74,7 @@
       (流量限制)  \listeqn \label{def:flow1}
     \item \makebox[7cm]{$f(u, v) = -f(v, u), \; \forall (u, v) \in V \times V$ \quad} 
       (流量對稱) \listeqn \label{def:flow1}
-    \item \makebox[7cm]{對於所有 $v \in V$ ， 有 $ \sum\limits_{u \in V} f(v, u) = 0 $ \quad} 
+    \item \makebox[7cm]{對於所有 $v \in V \setminus \{s, t\}$ ， 有 $ \sum\limits_{u \in V} f(v, u) = 0 $ \quad} 
       (流量守衡) \listeqn \label{def:flow1}
   \end{itemize}
 
@@ -174,7 +174,7 @@ c(v, u) - f(v, u) = 0 - (- f(u, v)) = 3$ 。
 讓我們先暫停一會兒，來看看什麼是對偶問題。
 
 我們遇到的問題往往是一體兩面的，在求某個問題的最小值其實就是在求
-另一個問題的最小值。 比如說「某A最多可以有幾個蘿莉在身旁還能保持
+另一個問題的最大值。 比如說「某A最多可以有幾個蘿莉在身旁還能保持
 理智」其實就是在問「要陷害某A去坐牢最少要準備多少蘿莉」。或著「
 給你 1000 元你最多可以活幾天」其實就跟「你要活一個月至少需要多少
 錢」是同一類問題。
@@ -235,7 +235,7 @@ c(v, u) - f(v, u) = 0 - (- f(u, v)) = 3$ 。
 \begin{proof}
   注意到 $\sum\limits_{u, v \in A} f(u, v) = 0$，因為 $f(u, v) = -f(v, u)$，
   且由點的流量守恆，\\$\sum\limits_{v \in V} f(u, v) = 0, \; \forall u$，因此
-  \vspace*{-.5cm}\begin{align*}
+  \begin{align*}
     \abs{f(S, T)} &= \sum_{u \in S, v \in T} f(u, v) 
     = \sum_{u \in S, v \in T \cup S} f(u, v) \\
     &= \sum_{u \in S \setminus \{s\}, v \in V} f(u, v)
@@ -332,9 +332,9 @@ Edmonds-Karp algorithm 是 Ford-Fulkerson algorithm 的一個小改進，他的
 \begin{definition}
   我們定義 $d(u)$ 表示一個點到 $t$ 的最短距離。
 \end{definition}
-\begin{theorem}
+\begin{simthm}
   Edmonds-Karp 最多只會進行 $\ord{VE}$ 次擴充。
-\end{theorem}
+\end{simthm}
 \begin{proof}
 我們先證明一些引理：
 \begin{lemma}
@@ -800,119 +800,106 @@ $u_i, w_i$，而如果 $(v_i, v_j) \in E$ ，就建造 $u_i \rightarrow v_j$ 的
       %俗話說的好，工欲善其事，必先利其器。在學習任何字串演算法前，也要先熟悉C/C++裡的字串操作，不然題目來了還是無從下手！而字串的儲存可以用\texttt{char} Array, 也可以用C++裡的\texttt{std::string}，請熟悉這兩種的各種操作，輸入/出，以及相關的內建函數(如比較函數等等)。並指出下面程式的問題所在。
     %}
     
-  \subsection{String Matching}
-    \ExerciseProblem[經典問題]{ABA}{
-    給定字串$S$，求出最長的$A$使得$S = ABA$。$\cons{\ord{\abs{S}}}$
+    \ExerciseProblem[NPSC 2005 初賽 pE]{魔法部的任務}{
+有 $N$ 個事件，每個事件會在 $t_i$ 時間 $(x_i, y_i)$ 位置發生。現在你要派出一些鎢絲處理這些
+事件，鎢絲一開始在原點，並且單位時間只能水平或垂直移動一單位，
+對每個事件都必須要在該事件發生前有至少一個鎢絲到達，問最少需要幾個鎢絲。 $\cons{N < 1000}$
     }
 
-    \ExerciseProblem[POI XIII]{Periods of Words}{
-      給定字串$S$，求出最長的$A$使得 $A$ 是 $S$ 的前綴且 $S$ 是 $AA$ 的前綴。$\cons{\abs{S} \leq 10^6}$
+    \ExerciseProblem[TIOJ 1779]{房屋裁員}{
+      一間有 $N$ 個員工的公司決定要裁員，每個人都有一個可正可負的貢獻值，同時有
+      $M$ 個關係 $(a_i, b_i)$ 表示 如果 $a_i$ 被裁員的話 $b_i$ 也會憤而走人。
+      問要裁哪些人使得留下來的員工貢獻值和最大。 $\cons{N \leq 8000, M \leq 50000}$
+     }
+
+     \ExerciseProblem[POI XVI]{Ice Skates}{
+      在一個溜冰場有尺寸為 $[1, n]$ 的溜冰鞋各 $k$ 雙，對一個人而言，
+      如果他的腳尺寸為 $r$ ，則他可以穿尺寸在 $[r, r+d]$ 內的溜冰鞋。
+
+      今天有 $m$ 個事件發生，每個事件表示一個腳尺寸為 $r_i$ 的人
+      在 $t_i$ 的時間來溜冰場或是離開。請在每個事件後判斷是否
+      可以分配溜冰鞋使得每個人都恰能分到一雙可穿的溜冰鞋。
+      $\cons{n \leq 2 \cdot 10^5, m \leq 5 \cdot 10^5}$
     }
 
-    \ExerciseProblem[POI XII]{Template}{
-      給定字串$S$，求出最短的$A$使得 $A$ 可以覆蓋 $S$ 。 比如說 $\str{abaabaab}$ 可以用兩個 $\str{abaab}$ ，分別開頭在 $0, 3$ 蓋住。$\cons{\abs{S} \leq 10^6}$
+    \ExerciseProblem[經典問題]{最大逆序密度子序列}{
+      給你一個長度為 $n$ 的序列，請找出他的一個子序列 $A$，使得
+      $k / \abs{A}$ 最大，其中 $k$ 是 $A$ 中的逆序數對的個數。
+      $\cons{ n \leq 200 }$。
     }
 
-    \ExerciseProblem[經典問題]{近似匹配}{
-      給定字串$A, B$，以及一個整數$k$，求出所有$B$在$A$中$k$幾乎匹配的位置。我們稱$A[i, i+n-1], B[j, j+n-1]$是$k$幾乎匹配如果$\{ A[i+x] \neq B[j+x], \: 0 \leq x \leq n-1 \}$的個數不超過$k$個。 $\cons{\ord{k\abs{A} + \abs{B}}}$
-    }
-
-    \ExerciseProblem[TIOJ 1735 / Kelvin]{k-口吃子字串}{
-      定義一個$k$-口吃字串為某一個長度為 $k$ 的字串重複兩次的字串。如 $\str{abcabc}, \str{aaaaaa}$ 都是 $3$-口吃字串。給一個字串$S$和 $k$ ，請問有多少 $(i, j)$ 滿足 $S[i, j]$ 是 $k$-口吃字串。  \\
-      $\cons{\abs{S} \leq 10^5}$ 
-    }
-
-    \ExerciseProblem[經典問題]{KMP and Z value}{
-      給你一個字串的 fail function $\fail$ 和他的長度 $n$ (也就是說你並不知道原本的字串) ，請求出他的 Z value $Z$ 。 
-      反之亦然，給你一個字串的 Z value $Z$ ，請求出他的 fail function $\fail$ 。 
-      $\cons{ \ord{n} }$
-    }
-
-    \ExerciseProblem[TIOJ 1725]{Massacre at Camp Happy}{
-      定義兩個字串$A, B$是$k$-幾乎相同如果把 $A$ 的前 $k$ 個字元搬到最後面，那兩者恰相差一個字元，給你 $A, B$ ， 求出所有的 $k$ 使得他們是 $k$-幾乎相同。 $\cons{ \abs{A} = \abs{B} \leq 10^6 }$
-    }
-
-    \newcommand{\ZZ}{\operatorname{\mathcal{Z}}}
-    \ExerciseProblem[經典問題]{最長回文子字串}{
-      給一個字串 $A$ ，求出他最長的一個回文子字串。 $ \cons{ \ord{ \abs{A}} }$
-
-      這題可以用類似 Z-algorithm 的方法。我們先考慮如何求最長的{\bf 奇數}回文子字串。 令 $\ZZ(i)$表示以$i$為中心最長的回文字串為 $A[i-\ZZ(i), i+\ZZ(i)]$。 現在假設$(L, R) = (i-\ZZ(m), i+\ZZ(m))$, 即$A[L, R]$是一個以$a[m]$ 為中心的回文。如果 $j \in [m+1, R]$，考慮 $j' = 2m - j$，即$j$對$m$的反射點。現在與Z-algorithm類似，令 $L' = j - \ZZ(j')$，分別考慮 $L' > L, L' = L , L' < L$ 三種情況。
-
-      但此方法僅能求得奇數的回文長度。因此我們把原字串相鄰的兩個字元都插入一個不在字元集 $\Sigma$ 中的字元，如 $A = \str{abbab} \; \rightarrow A' = 
-  \str{a\$b\$b\$a\$b}$，這樣所有回文的長度都變成奇數了。
-    }
-
-    \ExerciseProblem[Codeforces Zlobober's blog]{Anti-hash text}{
-      在 Hashing 實作上，因為 C++ 的模運算 \texttt{\%} 是非常花時間的，因此有一種 Lazy hash 的方法是 直接 $\bmod{2^{32}}$ 或是 $\bmod{2^{64}}$，這樣直接在 $\texttt{int}, \texttt{long long}$ 下做運算就可以了。但這樣做有其風險在，以下說明其原因。
-
-      不妨假設此 Hash function 為
-      \[ f(A) = \sum_{i=0}^{n-1} a_i p^{n-1-i} \bmod{q} \]
-      其中 $p$ 為一奇數(否則此 Hash function 無意義)，$q = 2^m$，並且 $\str{a}, \str{b}$ 轉換成數字後分別為 $\alpha, \alpha + 1$ 。此時令
-      \[ A_0 = \str{a}, \quad A_j = \widetilde{A}_{j-1} A_{j-1} \]
-      其中 $\widetilde{A}$ 表示把字串 $A$ 中的 $\str{a}$ 換成 $\str{b}$， $\str{b}$ 換成 $\str{a}$。如：
-      \[ A_1 = \str{ba}, \quad A_2 = \str{abba}, \quad A_3 = \str{baababba}, \quad \cdots \]
-      現在考慮 $A_{k}, \widetilde{A}_{k}$，注意這兩個字串恰好是 $A_{k+1}$ 的前後半且 $A_k \neq \widetilde{A}_{k}$。請證明
-      \begin{align*}
-        f(\widetilde{A}_{k}) - f(A_{k}) &= p^0 - p^1 - p^2 + p^3 -p^4 + p^5 + \cdots + (-1)^{k-1} p^{2^{k}-1} \\
-        &= \sum_{i=0}^{2^{k}-1} b_i p^i  \quad = S
-      \end{align*}
-      其中 $b_i \in \{ 1, -1 \}$，且如果 $i$ 的二進位表示有偶數個 $1$ ，則 $b_i = 1$，否則 $b_i = 0$。並且有
-      \[ \sum_{i=0}^{2^{k}-1} b_i p^i = (p-1)(p^2-1)(p^4-1) \cdots (p^{2^{k-1}} - 1) \]
-      注意到 $(p^{2^r} - 1)$ 可以被 $2^{r+1}$ 整除 (Why?) ，所以 $S$ 可以被 $2^{1 + 2 + \cdots + k} = 2^{k (k+1)/2}$整除。因此只要 $2^{k(k+1)/2}$ 被 $2^m$ 整除，也就是$\frac{k(k+1)}{2} > m$，$A_{k}$ 和 $\widetilde{A}_{k}$ 的 Hash value 就會相同。因此可以用一個長度為 $2^{\ord{x}}$ 的字串構造出一個使 $q = 2^{\ord{x^2}}$ 的 Hash function 失效的反例，並且與 $p$ 的選擇無關。
-    } 
-
-    \ExerciseProblem[經典問題]{二維匹配}{
-      給你一個 $R_A \times C_A$ 的二維字串 $A$ ， 問一個 $R_B \times C_B$ 的二維字串 $B$ 有沒有出現在其中？ $\cons{ \ord{ R_A C_A + R_B C_B }}$。
-
-      一個巧妙的做法可參考 Baker-Bird Algorithm，令外也有用 Hash 的方法，令$c = C_B, \; a_i[j] = f(A[i][j, j+c-1])$，原題等價於問 $f(B[0]), f(B[1]), \cdots f(B[R_B-1])$ 是不是等於\\ 
-      $a_i[j], a_{i+1}[j], \cdots , a_{i+R_B-1}[j]$。這是一個一維的匹配問題。詳細可參考去年的講義。
-    }
-
-    \ExerciseProblem[ACM ICPC 2013-2014 NEERC Northern Subregional]{sed}{
-      給你$A, B$，求出字串 $X, Y$ 使得將 $A$ 中的 $X$ 取代為 $Y$ 後會變成 $B$，並且 $\abs{X} + \abs{Y}$ 最短。 取代的定義為找 $X$ 出現在 $A$ 的第一個位置，假設 $A[i, j] = X$ ，立刻將 $A[i, j]$ 變成 $Y$ ，並從 $j+1$ 繼續找下一個 $X$ 直到沒有為止。 $\cons{ \abs{A}, \abs{B} \leq 5000}$。
-    }
-
-  \subsection{Suffix structure}
-    \ExerciseProblem[經典問題]{最小的後綴}{
-      給一個字串 $A$ ，求出他字典序最小的後綴。 $\cons{\ord{\abs{A}}}$
-
-      有不需要建出Suffix Array的方法。 \footnote{Hint: 雙指針}
-
-      這有一些應用，如最小循環表示法。 有時候我們會把一個狀態或物體用一個字串表示，並且可能旋轉需視為相同的，也就是把字串前 $k$ 個字元接到後面視為相同。 這時候如果要比較兩個字串，可以先求他們的最小循環表示在進行比較。
-    }
-
-    \ExerciseProblem[經典問題]{重複子字串}{
-      給一個字串 $A$ ，求出他最長的一個重複的子字串，重複的部分可以重疊。比如說 $A = \str{cabababc}$，最長的重複子字串為 $\str{aba}$。 $ \cons{ \ord{ \sa } }$ \footnote{ $\ord{ \sa }$ 表示建出後綴數組所需的時間。} \\
-      如果改成不能重複呢？ $\cons{ \ord{ \abs{A} \log \abs{A} } }$
-    }
-
-    \ExerciseProblem[經典問題]{連續重複的子字串}{
-      給一個字串 $A$ ，求出他的連續重複次數最多的子字串。比如說 $A = \str{cababababc}$， $\str{ab}$在子字串$\str{abababab}$中連續重複了$4$次。
-    } $\cons{ \ord{ \abs{A} \log \abs{A} } }$
-
-    \ExerciseProblem[ASC 40]{Binary Suffix Array}{
-      給定一個 $n$ 個整數的序列 $a_1, a_2, \cdots, a_n$， 找出一個01字串 $A$ 使得 $A$ 的後綴數組 $\sa$
-      恰好是給定的序列，注意到有可能無解。
-    } $\cons{ \abs{A} \leq 3 \cdot 10^5}$
-
-    \ExerciseProblem[SPOJ 7258]{Lexicographical Substring Search}{
-      給一個字串 $A$ ，現在把 $A$ 的所有子字串列出，將重複的刪去後排序。對於 $Q$ 比詢問， 輸出字典序第 $k$ 小的子字串。
-    } $\cons{ \abs{A} \leq 90000, Q \leq 500}$
-
-    \ExerciseProblem[NTUOJ 2200]{Beautiful Substring}{
-      給一個字串 $A$ ， 把他所有不同的子字串找出來，令這個集合為 $S$ ，接著每次會給一個字串 $B_i$， 假設他所有不同的子字串的集合為 $T_i$， 就令 $S \leftarrow S \setminus T_i$，並輸出此時的 $\abs{S}$，也就是 $S$ 裡還剩多少字串。
-    } $\cons{ \abs{A} \leq 2 \times 10^5,\; \sum \abs{B_i} \leq 10^6}$
-
-    \ExerciseProblem[ASC 42]{Incomparable Suffixes}{
-      給一個字串 $A$ ， 我們說兩個字串 $s, t$ 是{\bf 可分辨的} 若且為若存在一個字串 $z$ 使得 $sz, tz$ 中恰好只有一個是
-      $A$ 的後綴， 說兩個字串 $s, t$ 是 {\bf 無可比較的} 若且為若對所有 $s$ 的前綴 $x$ ， $t$ 的前綴 $y$ ， 
-      $x, y$ 都是可分辨的。 現在請找出 $a_1, a_2, \cdots, a_n$ 滿足：
+    \ExerciseProblem[經典問題]{二分圖上的一些問題}{
+      求二分圖的
       \begin{enumerate}
-        \item 所有 $a_i$ 都是 $A$ 的後綴。
-        \item $n$ 越大越好。
-        \item 在 $n$ 是所有可能的最大值下， $\sum \abs{a_i}$ 越大越好。
+        \item 最小點覆蓋，也就是找一個大小最小的點集，使得原圖所有的邊
+          都至少有一個端點在點集裡。
+        \item 最大獨立點集，也就是找一個大小最大的點集，使得裡面所有的點
+          在原圖上都不相鄰。
       \end{enumerate}
-    } $\cons{ \abs{A} \leq 10^5}$
+      這些問題與二分圖最大匹配有何相關？
+    }
+
+    \ExerciseProblem[Petya and Pipes]{Codeforces 362E}{
+      現在有一個流量網路，你可以把增加某些邊的流量，但增加的量必須是整數且
+      增加量的總合必須不超過 $k$。問你在最佳的配置下最大流的大小。
+      $\cons{ \abs{V} \leq 50, k \leq 1000 }$
+    }
+
+    \ExerciseProblem[POI XII]{Dicing}{
+      你和一群人總共 $n$ 個人在比賽，比賽分成 $m$ 個賽局，每局兩個人決定誰
+      勝誰負，最後勝場最多的人就是冠軍。現在給你 $m$ 個賽局各別是哪兩個人參加
+      ，問你要至少贏幾場才有機會是冠軍(也就是如果你贏的場數比這個還少，不論
+      其他人對戰的結果，你都無緣爭冠)。
+    }
+
+    \ExerciseProblem[UVa 11419]{SAM I AM}{
+      給你一個 $R \times C$ 的格子，有一些格子內有敵人。現在每次可以用
+      雷射光消滅一行或一列的敵人。問你至少要發射多少次雷射光才可以殲滅
+      敵人。 $\cons{ R, C \leq 1000}$
+    }
+
+    \ExerciseProblem[經典問題]{一開始有負環的 Cost Flow}{
+      如果 Cost flow 一開始就有負環，那文中介紹的演算法就不能使用了。這時候
+      一個方法是改用別的 Cost flow 算法，如 Cycle-cancelling algorithm 等等，
+      或是修改一下原來的演算法，如下所述。
+
+      現在對於一開始所有的負邊，我們都強迫這些邊的流量要流滿。但是這樣子點流量
+      可能就不守恆了。請用與「下界流」相同的想法，修改一下原來的圖使得最後的
+      點流量都會守恆，並整理出一個可以在有負環下運作的演算法。
+    }
+
+    \ExerciseProblem[NTUJ 1865]{Indigo Children}{
+      給一個簡單圖，對於每個點 $u$ 有些權重 $f(u)$ 已經被決定了，有些你可以決定。
+      每個權重在 $[0, 65535]$ 之間。你要把決定權重未知的點的權重，使得整張
+      圖的 cost 最小。圖的 cost 定為 $\sum\limits_{(u, v) \in E} f(u) \oplus f(v)$。
+    }
+
+    \ExerciseProblem[NPSC 2009 決賽 pF]{飛機上有蛇}{
+      給你一張 $R \times C$ 的格子圖，格子是四方相鄰的，且有一些格子有障礙物。
+      現在你要用許多蛇把所有非障礙物的格子都覆蓋過一次。蛇有兩種：
+      \begin{enumerate}
+        \item 頭尾相接的蛇。
+        \item 頭尾都貼在地圖邊界的蛇。
+      \end{enumerate}
+      問你至少要用到多少種類 2. 的蛇才能達成目標。 
+      $\cons{R, C \leq 30}$
+    }
+
+    \ExerciseProblem[TIOJ 1644]{棋盤策略遊戲}{
+      給你一張 $R \times C$ 的格子圖，格子是四方相鄰的，且有一些格子有障礙物。
+      現在兩個人 $A, B$ 玩一個遊戲。$A$ 先決定一個沒有障礙物的格子當出發點，
+      之後先手把一個棋子放在那個格子上，然後後手就在與前一個人放的相鄰、且
+      沒有棋子和障礙物的格子上再放一個棋子，依此輪流下去。誰先不能放就輸了，
+      問先手贏還是後手贏。
+      $\cons{R, C \leq 300}$
+    }
+
+    \ExerciseProblem[NTUJ 1214]{Holidays}{
+      Tmt 想在接下來的 $3n$ 天挑幾天來休假。如果第 $x$ 天休假的話會獲得 $x$ 個
+      好度。唯一的限制是任何連續 $n$ 天不能修假超過 $k$ 天，問你能獲得的最大好度。
+      $\cons{n \leq 200, k \leq 10}$
+    }
+
   \section{Special Thanks}
   此分講義部分參考自前年的講義，特別感謝前年的編輯者。
 \end{document}

@@ -26,6 +26,7 @@
 % 文字的彈性間距
 \XeTeXlinebreakskip = 0pt plus 1pt
 
+\usepackage{parskip}
 % 段距
 \setlength{\parskip}{1em}
 % 行距
@@ -436,6 +437,7 @@
 \theoremheaderfont{\normalfont\bfseries}
 \theorembodyfont{\normalfont\Kai}
 \newmdtheoremenv[%
+  skipabove=1.2em,
 	outerlinewidth=1.2pt,%
 	leftmargin=40pt,%
 	rightmargin=40pt,%
@@ -444,7 +446,6 @@
 	ntheorem=true,%
 	font=\Kai\mathversion{mymath},%
 ]{theorem}{}[chapter]
-
 
 %%%
 %%%		Table Of Contents
@@ -473,24 +474,30 @@
 \usepackage{listings}
 \usepackage{fancyvrb}
 \usepackage{float,amssymb}
+\usepackage{centernot}
 \usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{automata}
 \newtheoremstyle{simpletheoremstyle}% 自定義Style
 {\item[\hskip\labelsep  {\bf ##1}]}{}%       上下間距
 \theoremstyle{simpletheoremstyle}
+
 \newmdtheoremenv[%
+  skipabove=1em,
+  endcode={\kfjakldfjklasjdklf},
 	backgroundcolor=black!5,%
 	ntheorem=true,%
   font=\Kai\mathversion{mymath},%
   leftline=false,topline=false,rightline=false,bottomline=false
   ]{lemma}{引理}[section]
 \newmdtheoremenv[%
+  skipabove=1em,
 	backgroundcolor=black!5,%
 	ntheorem=true,%
   font=\Kai\mathversion{mymath},%
   leftline=false,topline=false,rightline=false,bottomline=false
   ]{definition}{定義}
 \newmdtheoremenv[%
+  skipabove=1em,
 	backgroundcolor=black!5,%
 	ntheorem=true,%
   font=\Kai\mathversion{mymath},%
@@ -499,10 +506,20 @@
 \newtheoremstyle{simpletheoremstyle2}% 自定義Style
 {\item[\hskip\labelsep  {\it ##1}] \LiHeiPro}{}%       上下間距
 \theoremstyle{simpletheoremstyle2}
+\setlength\theorempreskipamount{1em}
 \newtheorem{proof}{Proof.}
 \theoremstyle{customthm}
 %\newcommand*{\qed}{\hfill\ensuremath{\blacksquare}}
 \newcommand{\contradict}{\ensuremath{\Rightarrow\hspace*{-1pt}\Leftarrow}}
 \newcommand{\pass}{\mbox{}\vspace*{-10pt}}
+
+\makeatletter
+\g@addto@macro\normalsize{%
+  \setlength\abovedisplayskip{8pt}
+  \setlength\belowdisplayskip{8pt}
+  \setlength\abovedisplayshortskip{8pt}
+  \setlength\belowdisplayshortskip{8pt}
+}
+\makeatother
 
 \usepackage{wasysym} % add by seanwu
