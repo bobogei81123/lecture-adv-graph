@@ -513,6 +513,23 @@ $P = (v_1, v_2, \dots, v_n)$，除了起點和終點以外，每個點都會從�
 重複出現在路徑 $P$ 上，因此我們可以知道除了起點/終點外，每個點的度數
 都要是偶數！事實上對於連通圖，這不僅是必要條件，還是充分條件。
 
+而如果要輸出一組解有以下一個簡單的演算法
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \caption{Find an Euler Path}\label{euclid}
+  \SetKwFunction{FF}{DFS}
+  \SetKwFunction{AAP}{AugmentAlongPath}
+  \SetKwProg{myalg}{Algorithm}{}{}
+  \SetKw{each}{each}
+  \myalg{\FF{$v, P$}} {
+  \For{\each edge $e = (v, u)$ start from $v$ that has not been walked}{
+    \FF{$u$} \;
+  }
+  $P$.append($v$) \;
+}
+\end{algorithm}
+
 \begin{theorem}
   定義一個{\bf 奇點}是度數為奇數的點。如果圖連通，有
   \begin{itemize}
@@ -527,11 +544,11 @@ $P = (v_1, v_2, \dots, v_n)$，除了起點和終點以外，每個點都會從�
 
 
 \SampleProblem{構造字串}{ 
-  問你存不存在一個字串 $S$ 使得子字串 \texttt{`}$ab$\texttt{'} 恰好出現
-  過 $c_{a, b}$ 次，其中 $a, b \in \texttt{`}0123456789\texttt{'}$。
+  問你存不存在一個字串 $S$ 使得子字串 \texttt{'}$ab$\texttt{'} 恰好出現
+  過 $c_{a, b}$ 次，其中 $a, b \in \texttt{'}0123456789\texttt{'}$。
 
   如 $c_{0, 0} = 2, c_{0, 1} = 1, c_{1, 1} = 1, c_{1, 0}=2$，有字串
-  \texttt{`1100010'}。
+  \texttt{'1100010'}。
 }
 
 如果把字串，如 \texttt{`13413'} 想像做從 $v_1 \to v_3 \to v_4 \to v_1 \to v_3$ 的
@@ -808,23 +825,42 @@ $\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
       給一個邊有權的樹，求一個路徑使得路徑上權值和模 $m$ 下最大。 $\cons{\abs{V} \leq 10^5}$
     }
 
+    \ExerciseProblem[IOI 2007 Day 2]{Training}{
+      給你一個帶權的圖和他的一個生成樹，你要找一個權重和最小的邊集使得
+      原本的圖去掉這個邊集後沒有偶環。每個點的度數至多是 $10$。
+      $\cons{\abs{V} \leq 1000, \abs{E} \leq 5000}$
+    }
+
     \ExerciseProblem[Codeforces 223E]{Planar Graph}{
       給一個連通的平面圖，每次會給你圖上的一個環 $C_i$，問你環內有幾個點。\\
       $\cons{\abs{V} \leq 10^5, \sum \abs{C_i} \leq 10^5}$
     }
 
-    \ExerciseProblem[POJ 1737]{Conntected Graph}{
-      問你 $n$ 個有編號的點可以形成多少不同的連通圖。 $\cons{n \leq 50}$
+    \ExerciseProblem{競賽圖}{
+      對於一個競賽圖，請證明
+      \begin{enumerate}
+        \item 一定存在一個點 $v$，使得對於其它點 $v$，要嘛 $u \to v$ 有邊，要嘛
+          存在一個點 $w$，使得 $u \to w \to v$ 可以通。
+        \item 如果不存在一個點 $v$ 使得他贏過所有人，也就是不是所有 $u$， $v \to u$
+          都有邊，並也不存在一個點輸給所有其它人，則存在 Hamiltonian cycle.
+      \end{enumerate}
     }
 
-    \ExerciseProblem[Codeforces 600F]{Edge coloring of bipartite graph}{
-      給你一個二分圖，求他最小的一個邊著色。 $\cons{\abs{V} \leq 2000, \abs{E} \leq 10^5}$
+    \ExerciseProblem[NTUJ 2045]{Strygwyr, the Bloodseeker}{
+      給你一個競賽圖，你要找一個 Hamiltonian path，使得假設這一個 path 為\\
+      $v_1, v_2, \dots, v_n, n = \abs{V}$，對於所有 $i < j$，都存在一個
+      長度不超過 $2$ 的路徑 $v_i \leadsto v_j$。
+      $\cons{\abs{V} \leq 10^5}$
     }
 
-    \ExerciseProblem[ASC 47 pF]{Four Colors}{
-      現在有一棵樹，$A, B$ 兩個人玩一個遊戲，$A$ 先開始輪流選一個還沒有塗色的點塗成 $4$ 種顏色的
-      其中一種，但相鄰的兩個點不能塗同一種顏色。如果一個人不能行動遊戲就結束。
-      遊戲結束時所有的點都被塗色的話 $A$ 贏，否則 $B$ 贏。問 $A$ 的必勝策略？
+
+    \ExerciseProblem[TIOJ 1692]{道路巡邏問題}{
+      給你一個圖，用最少的一筆劃路徑把整個圖的邊都走過。
+      $\cons{\ord{V + E}}$。
+    }
+
+    \ExerciseProblem{Hamiltonian Path}{
+      請證明如果圖中所有點的度數都比 $\ceil{\abs{V}/2}$ 大，則存在 Hamiltonian path.
     }
 
     \ExerciseProblem[NTUJ 2061]{Halin Graph}{
@@ -845,30 +881,25 @@ $\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
       $\cons{\abs{V} \leq 10^5, \abs{E} \leq 2 \cdot 10^5}$
     }
 
+    \ExerciseProblem[Codeforces 600F]{Edge coloring of bipartite graph}{
+      給你一個二分圖，求他最小的一個邊著色。 $\cons{\abs{V} \leq 2000, \abs{E} \leq 10^5}$
+    }
+
+    \ExerciseProblem[ASC 47 pF]{Four Colors}{
+      現在有一棵樹，$A, B$ 兩個人玩一個遊戲，$A$ 先開始輪流選一個還沒有塗色的點塗成 $4$ 種顏色的
+      其中一種，但相鄰的兩個點不能塗同一種顏色。如果一個人不能行動遊戲就結束。
+      遊戲結束時所有的點都被塗色的話 $A$ 贏，否則 $B$ 贏。問 $A$ 的必勝策略？
+    }
+
+
     \ExerciseProblem{同色三色形}{
       給你一個完全圖，圖的邊不是黑色就是白色，問你有幾個同色三角形。 $\cons{\ord{\abs{V}^2}}$
     }
 
-    \ExerciseProblem{競賽圖}{
-      對於一個競賽圖，請證明
-      \begin{enumerate}
-        \item 一定存在一個點 $v$，使得對於其它點 $v$，要嘛 $u \to v$ 有邊，要嘛
-          存在一個點 $w$，使得 $u \to w \to v$ 可以通。
-        \item 如果不存在一個點 $v$ 使得他贏過所有人，也就是不是所有 $u$， $v \to u$
-          都有邊，並也不存在一個點輸給所有其它人，則存在 Hamiltonian cycle.
-      \end{enumerate}
+    \ExerciseProblem[POJ 1737]{Conntected Graph}{
+      問你 $n$ 個有編號的點可以形成多少不同的連通圖。 $\cons{n \leq 50}$
     }
 
-    \ExerciseProblem{Hamiltonian Path}{
-      請證明如果圖中所有點的度數都比 $\ceil{\abs{V}/2}$ 大，則存在 Hamiltonian path.
-    }
-    
-    \ExerciseProblem[NTUJ 2045]{Strygwyr, the Bloodseeker}{
-      給你一個競賽圖，你要找一個 Hamiltonian path，使得假設這一個 path 為\\
-      $v_1, v_2, \dots, v_n, n = \abs{V}$，對於所有 $i < j$，都存在一個
-      長度不超過 $2$ 的路徑 $v_i \leadsto v_j$。
-      $\cons{\abs{V} \leq 10^5}$
-    }
 
     \ExerciseProblem[NTUJ 2539]{Drawing Hell}{
       給你一個平面圖，兩個人玩一個遊戲，輪流連一條邊，但邊不可以和已經在圖上的
@@ -889,22 +920,38 @@ $\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
       $\cons{\abs{2n} \leq 10^5}$
     }
 
-    \ExerciseProblem[IOI 2007 Day 2]{Training}{
-      給你一個帶權的圖和他的一個生成樹，你要找一個權重和最小的邊集使得
-      原本的圖去掉這個邊集後沒有偶環。每個點的度數至多是 $10$。
-      $\cons{\abs{V} \leq 1000, \abs{E} \leq 5000}$
-    }
-
     \ExerciseProblem[ACM ICPC Taipei regional pE]{怪圖怪題}{
       給你一個圖，邊的距離都是 $1$，滿足所有的點雙連通元件都是完全圖。你要在裡面選
       $k$ 個點，使得這 $k$ 個點連通，並且所有點到這個點集的距離和最少。
       $\cons{\ord{kVE}}$
     }
 
-    \ExerciseProblem[ASC pF]{Graph Factorization}{
+    \ExerciseProblem[ASC 35 pF]{Graph Factorization}{
       給你一個有偶數個點的完全圖 $K_{2n}$，把他的邊分解成 $2n - 1$ 個集合，
       使得每個點在一個集合裡都只與一個邊相鄰(也就是每個集合都是一個匹配)。
       $\cons{n \leq 100}$
+    }
+
+    \ExerciseProblem[ASC 34 pI]{Tour}{
+      給你一棵樹，問你要加幾條邊才會有一個 Hamiltonian Cycle。
+      $\cons{\abs{V} \leq 10^5}$
+    }
+
+    \ExerciseProblem[ASC 34 pA]{Three Color}{
+      給你一個二分圖 $G$，你要給每個邊一個 $0, 1, 2$ 的權值，使得令 $f(v)$ 表示一與點
+      $v$ 相鄰的所有的邊的權值總合，所有 $f(v)$ 都不相同。
+      $\cons{\abs{V} \leq 3000, \abs{M} \leq 10000}$
+    }
+
+    \ExerciseProblem[ASC 38 pJ]{Jackpot}{
+      現在有一個圖，兩個人 $A, B$ 玩一個遊戲，輪流把圖上的一個點塗黑或白色，但
+      相鄰的點不能塗同一個顏色。誰塗不了就輸了，問雙方都使用最佳策略的情況下誰贏。
+      $\cons{\abs{V}, \abs{E} \leq 10^5}$
+    }
+
+    \ExerciseProblem[ASC ??]{??}{
+      給你一棵樹，要加上幾條邊才可以讓整張圖雙連通？
+      $\cons{\ord{V}}$
     }
 
   \section{Special Thanks}
