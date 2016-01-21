@@ -36,7 +36,35 @@
 \subsection{樹}
 一個沒有環的連通圖就是一棵樹。相信大家對樹的性質都已經很熟悉，因此
 這邊介紹一些進階的技巧。
+
 \subsubsection{樹的子樹區間}
+俗稱的「把樹壓平」，其實就是希望對於每一個點 $v$ ，都定出 $L_v, R_v$，
+使得如果 $u$ 在 $v$ 的子樹下，有 $[L_u, R_u] \subset [L_v, R_v]$，也就是
+$L_v \leq L_u \leq R_u \leq R_v$。
+\begin{theorem}[樹的子樹區間]
+  $\texttt{}$ 我們可以用以下方法得到 $L_v, R_v$，維護一個計數器 \texttt{cnt}
+  ，一開始 $\texttt{cnt} = 0$並從根開始 DFS。
+  \begin{itemize}
+      \item 當第一次到一個點 $v$ 時，就讓 $L_v = \texttt{cnt}$。
+      \item 當離開一個點 $u$ 時，就讓 $R_v = \texttt{cnt}$，然後 $\texttt{cnt}
+          \gets \texttt{cnt} + 1$。
+  \end{itemize}
+  得出的 $L_v, R_v$ 便是一個合理的子樹區間。
+\end{theorem}
+這可以用來解決不少區間查尋的問題
+
+\SampleProblem[經典問題]{樹上查詢}{
+	給定一棵$N$個點的有根帶點權樹，接著$Q$個操作，每次操作可能是：
+	\begin{itemize}
+	\item \InlineCode$add x c$: 把以$x$為根的子樹的所有節點權重同加上$c$
+	\item \InlineCode$change x c$: 把以$x$為根的子樹的所有節點權重變成$c$
+	\item \InlineCode$query x$: 詢問以$x$為根的子樹的權重最大值。
+	\end{itemize}
+	$1 \le N, Q \le 100000$
+}
+用上述的方法將樹做子樹區間，原本的題目就變成是在區間上做一些查詢或是修改，
+用線段樹等等的資料結構處理即可。
+
 \subsubsection{樹分治}
 就是在樹上使用分治法，對於一棵樹，每次選擇 $v$ 一個點拔掉，將原來的樹
 分成很多個子樹，並對這些子樹遞迴求解。最後再將這些子樹合併回去。
@@ -186,6 +214,36 @@ $(u \to v) \land (v \to w) \centernot\implies u \to w$。}
 $w \to v \in E$，因此我們只要遞迴下去做 $A, \bar{A}$，最後用
 $v$ 這個點把他們兩個的 Hamilton path 串起來就可以了！
 
+有趣的是這題用「幾乎所有的排序法」都會對，如 Merge sort 或是 
+Insertion sort 等等。
+
+\subsection{二分圖}
+如果一個圖可以被分成兩個點集 $U, V$ 使得任兩個點 $u, v$ 如果在
+同一個集合的話，他們之間一定沒有邊，即 $(u, v) \notin E$，則我們
+就稱這個圖是一個二分圖。這也等價於可以被二著色，且相鄰的點不同色。
+
+要判斷一個圖是否是二分圖，一個最簡單的方法就是把這個二分圖遞迴黑白染色，
+也就是從一個點 $u$ 開始，把 $u$ 先圖成白色，再把其周圍的點圖成黑色，然後
+把距離 $2$ 的點都塗成白色…依此類推，最後再檢查是不是每一個邊的兩端都不同
+色即可。
+
+另一個做法是用{\bf 併查集}，對每一個點 $u$ 都建兩個對應的點，$u_0, u_1$。可以把
+$u_0$ 想做是「你的顏色」，$u_1$ 則是「非你的顏色」。對於每一條邊 $(u, v)$，
+我們就把 $(u_0, v_1), (u_1 v_0)$ 做併查集的合併，意思就是「$u$ 的顏色是非 $v$ 的
+顏色」，而圖是二分圖的條件即是每個點 $u$ 對應到的兩個新點 $u_0, u_1$ 都在不同的
+併查集裡，如以下這個例題。
+
+\SampleProblem[TIOJ 1672]{分子碰撞實驗}{
+  現在有一個未知的序列 $a_1, a_2, \dots, a_n$，依序給你些個資訊 $(s, t, p)$，
+  其中 $p \in \{0, 1\}$ 代表 $a_s + a_{s+1} + \dots + a_t \equiv p \pmod{2}$，
+  每次你要判斷給你的資訊會不會和已知的資訊有所矛盾，並且如果有矛盾則捨棄之。
+}
+
+如果我們令 $b_i = \sum\limits_{0}^{i-1} a_j$，可以發現每次的資訊其實就是在告訴你
+$a_{s-1}$ 和 $a_t$ 的奇偶性是相同還是相異。因此我們就修改上述的做法就可以了！
+假設 $u = a_{s-1}$ 且 $v = a_t$ 並用剛才的記號，如果他們同奇偶則檢查 $(u_0, v_1)$
+是否在不同的集合裡，是的話再合併 $(u_0, v_0), (u_1, v_1)$，反之亦然。
+
 \section{有關圖的問題}
 與圖論有關的問題非常多，幾本上不太可能全部掌握，除了多了解一些結論之外，
 舉一反三和臨場見招拆招的能力也是很重要的！
@@ -261,74 +319,311 @@ $\NP$ 裡「最難」的問題就代表{\bf 如果你會解這個問題，那所
 的「平面圖最大團」問題，一般圖的最大團問題是 $\NPC$，因此關鍵一定在平面圖的
 性質上！
 
-首先我們定義什麼是字串。
-\begin{theorem}[定義]
-  給定一個字元集$\Sigma$，一個\emph{字串}是一些字元的有序序列，我們寫作
-  \[ A = a_0 a_1 \cdots a_{n-1} \]
-  其中$a_i \in \Sigma$。我們把$n$叫作字串的長度。
-\end{theorem}
-舉個例子，如果$\Sigma = \{\texttt{"A"}, \texttt{"C"}, \texttt{"G"}, \texttt{"T"}\}$，$A$可能表示你的DNA序列，或者如果$\Sigma = \{\texttt{"0"}, \texttt{"1"}, \cdots \texttt{"9"}\}$，那麼$A$可能代表客戶的電話號碼。這時候就會有許多有趣的問題了，比如：
-\begin{itemize}
-  \item 假設另一段DNA字串$B$代表一個可能的致癌基因，如何快速的判斷一個人是否帶有這種基因？
-  \item 現在有幾種不同的生物的DNA序列，如何判斷這些字串間的相似成度，以了解演化順序？
-\end{itemize}
-對於這些問題，數據的大小可以是非常大的，我們勢必會需要一些好的演算法來解決它們！不過在這之前我們必需先說清楚一些定義。
+接下來我們就討論一些圖上常見的問題！
 
-\begin{theorem}[定義]
-  給定一個字串$A = a_0 a_1 \cdots a_{n-1}$
+\subsection{2-SAT}
+\SampleProblem{2-SAT}{
+  給你一個關於變數 $x_1, x_2, \dots, x_n$ 且形式如下的布林代數式
+  \[ (y_1 \lor y_2) \land (y_3 \lor y_4) \land \dots \land (y_{2m-1} \lor y_{2m}) \]
+  其中 $y_1, y_2, \dots, y_{2m}$ 都是某個 $x_i$ 或是 $\lnot x_i$。也就是每個括號裡都
+  恰有兩個變數 \texttt{or} 起來後再全部 \texttt{and} 起來。
+  問你是否可以給每一個變數 $x_i$ 一個 \texttt{true} 或是 \texttt{false} 
+  值使得原本的布林代數式的結果為 \texttt{true}？
+}
+這個問題有一個很 well known 的解法，對於每個刮號，假設是 $(x_3 \lor \lnot x_4)$
+好了，代表不是 $x_3 = \texttt{true}$，就是 $x_4 = \texttt{false}$。也就是
 \begin{itemize}
-  \item 一個\emph{子字串}是其連續的一段$a_i a_{i+1} a_{i+2} \cdots a_j$ 記作$A[i,j]$。
-\item 一個\emph{子序列}是一個字串$B = a_{q_1} a_{q_2} a_{q_3} \cdots a_{q_m}$，其中$0 \leq q_1 < q_2 < q_3 < \cdots < q_{m-1} < q_m < n$ 。
-\item 一個$A$的\emph{前綴}是$A$的一個子字串$a_0 a_1 a_2 \cdots a_{h}$，其中$0 \leq h < n$，記作$P_A(h)$。
-\item 一個$A$的\emph{後綴}是$A$的一個子字串$a_k a_{k+1} a_{k+2} \cdots a_n$，其中$0 \leq k < n$，我們特別記作$S_A(k)$。並讓所有後綴的集合稱作$\suf(A)$。
+  \item 如果 $x_3 = \texttt{false}$，那必定有 $x_4 = \texttt{false}$，用邏輯的語言
+    寫就是 $\lnot x_3 \rightarrow \lnot x_4$。
+  \item 如果 $x_4 = \texttt{true}$，那必定有 $x_3 = \texttt{true}$，用邏輯的語言
+    寫就是 $x_3 \rightarrow x_4$。
 \end{itemize}
-\end{theorem}
-舉例來說，如果$A = \str{abcbbab}$，那\str{bcb}是他的子字串，\str{acb}是他的子序列，而\str{bbab}是他的一個後綴。
+不知道大家有沒有感覺和二分圖判定的時候有點像！只是現在的關係是單向的而已，如上述例子，
+$x_3 \rightarrow x_4$，但沒有強迫 $x_4 \to x_3$。
 
-\section{字串的儲存}
-通常最基本的儲存方式就是用一個陣列依序將字串的每一個字元存下來。不過當我們要同時儲存許多字串時，可能就要花點巧思了。而這邊要介紹一個可以同時儲存多個字串的資料結構─{\bf  字典樹 Trie}。\\
-Trie的道理非常簡單，其實就是用一棵樹來儲存字串。在這棵樹上，每個點(除了根節點之外)上都有一個字元，而從根節點一路走到某個節點，依序經過的字元串起來就是那個點代表的字串。最後我們再記錄哪些點是一個字串的最後一個字元即可！
-如Figure~\ref{fig:trie}就是一個儲存$\{A_1 = \str{abc}, A_2 =\str{abde}, A_3 = \str{bc}, A_4 = \str{bcd}\}$的trie
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}
-    [every node/.style = {draw, circle, minimum size = 1cm}
-    ,edge from parent/.style = {draw, -latex, thick}
-    ,level distance = 20mm
-    ,endn/.style = {thick, double=gray!20, double distance = 2pt, fill=gray!20}]
-    \node{\char`\^}[grow=east] {
-      child{node {a} 
-        child{node {b} 
-          child{node[endn]{c}}
-          child{node{d}
-            child{node[endn]{e}}
-          }
-        }
-      }
-      child{node{b}[]
-        child{node[endn]{c}[grow=north east]
-          child{node[endn]{d}}
-        }
-      }
-    }
-    ;
-  \end{tikzpicture}
-  \caption{An example of trie}
-  \label{fig:trie}
-\end{figure}
+因此解法就是把每一個變數看成是兩個點 $x_i, \lnot x_i$，
+再如上面的例子所示把所有關係都建一個有向邊出來，
+基本上 $(x_i, x_j), (\lnot x_i, \lnot x_j)$
+的建法也類似，讀者可以自己推敲，只有 $(x_i, x_i)$ 這種兩個變數相同比較特別，
+想一下後可以知道需要把 $\lnot x_i \to x_i$。
+\footnote{用邏輯的解釋，因 $a \to b \equiv \lnot a \lor b$，
+  $\lnot x_i \to x_i \equiv (\lnot \lnot x_i) \lor x_i \equiv x_i$
+}
+類似的 $(\lnot x_i, \lnot x_i)$ 就建 $x_i \to \lnot x_i$。
+
+最後可以發現如果在圖上 $u$ 可以走到 $v$，表示如果「選了」$u$ 就一定要選 $v$，
+因此可以想像有解的條件就是對於所有 $x_i, \lnot x_i$，要嘛 $u$ 不能走到 $v$，
+要嘛 $v$ 不能走到 $u$，用圖論的說法就是{\bf $x_i, \lnot x_i$ 不能在同一個強連
+  通元件！}用 Tarjan 等等的演算法即可以在 $\ord{V+E}$ 的時間內做到。
 %
-\begin{theorem}[定義]
-  給定一個字典樹Trie \  $T = \{V, E\}$，我們定義$P_T(v)$為從根節點走到$v$所得出的字串。
+\SampleProblem{以前看過的題目}{給你一個 $R \times C$ 的方格，你有一種特殊的炮彈可以炸一排或一列，
+  不過同一排或一列最多只能炸一次。每一格除了可能是空地外，還有可能是
+  \begin{description}[leftmargin=!, labelwidth=\widthof{一一一一}]
+    \item[敵方要塞] 你必須炸兩次才能消滅他。
+    \item[敵方軍團] 你必須炸一次以上才能消滅。
+    \item[住宅區] 為了必免無辜的人受害，最多只能炸一次。
+    \item[醫院] 這個不用說，當然是炸都不能炸。
+  \end{description}
+  問你每一排及每一列該選擇炸或是不炸，才能使每一格都符合上述的需求？
+}
+我們可以用布林變數 $x_i$ 表示第 $i$ 排要炸還是不炸，用 $y_i$ 表示第
+$j$ 排要炸與否，那這些規定其實就是
+  \begin{description}[leftmargin=!, labelwidth=\widthof{一一一一}]
+    \item[敵方要塞] $x_i \land y_j \equiv (x_i \lor x_i) \land (y_j \lor y_j)$
+    \item[敵方軍團] $x_i \lor y_j$
+    \item[住宅區] $\lnot x_i \lor \lnot y_j$
+    \item[醫院] $\lnot x_i \land \lnot y_j \equiv 
+      (\lnot x_i \lor \lnot x_i) \land (\lnot y_j \lor \lnot y_j)$
+  \end{description}
+  轉成 2-SAT 解即可！
+
+\subsubsection{3-SAT}
+很不幸的 3-SAT 問題，也就是每個刮號可能有三個變數，雖然好像只差一點
+卻是個 $\NPC$ 問題。不過並不是 $\NPC$ 問題
+就不值得研究或是優化，有好的搜索方法還是會差很多！現在有些 SAT-solver 在一般沒有設計過的
+測資 (如電路等等) 似乎跑到 $10^4$ 個變數都不是問題，好像也是目前在解如電路等價等等
+一個很不錯的解法。
+
+\subsection{著色問題}
+\subsubsection{點著色}
+點著色就是要把圖上的點都塗上顏色，使得相鄰的點都要不同色，並要求用的顏色越少越好。
+如果最少用 $k$ 個顏色就足夠了，我們就稱這個圖的著色數為 $k$。
+點著色是 $\NPC$ 問題，但是在特殊的圖可能會有特殊的方法。比如大家都熟悉的四色定理
+
+\begin{theorem}[四色定理]
+  任意一個平面圖一定可以 $4$ 著色。
 \end{theorem}
-而Trie的基本操作也都很簡單，如要新增一個字串$A$，我們就從根節點開始，依照字串$A$的第$0, 1, 2, \cdots, n-1$個字元，如果此字元在當前節點的子節點中就繼續走下去，否則就新增一個節點。
 
-\section{字串匹配}
-  字串匹配是一個生活中一定會遇到的問題。當你要從一篇滿滿文字的網頁或是pdf檔找關鍵字時，相信大家一定會本能的按下ctrl-f，接著一瞬間，電腦就會自動算好所有蒐尋字串出現的位置。看似簡單，嘿嘿！其實裡面可是有大學問的呢。
+我們來看一個例題。
+\SampleProblem[NERC 2010-2011 pK]{K Graph Oddity}{
+  給你一個連通圖 $G$ 滿足 $G$ 有奇數個點，且存在一個奇數 $k$ 使得所有點的度數都
+  不超過 $k$。請你把這張圖點 $k$ 著色。
+}
 
-\SampleProblem[Everywhere]{String Matching}{ 給你兩個字串 $A$, $B$ 找出所有 $B$ 出現在 $A$ 中的位置。}
+其實畫一畫會發現，因為度數最高是 $k$，要把一個圖 $k$ 著色其實非常容易。如果
+一個點的度數小於 $k$，也就是最多 $k-1$，那我們跟本不用考慮這個點，等其它點都
+塗色了以後，再找一個顏色不在其 $k-1$ 個鄰居中就可以了。
 
-而一般大家最先想到的做法通常是…就把所有的位置試過一遍！ 
-\SourceCode[naive-matching]{naive-matching.cpp}{1}{9999}
+那會不會所有點的 degree 都是 $k$ 呢？不會！否則所有點的度數合是 $k\abs{V}$，這個
+等於 $2 \abs{E}$，但 $k, \abs{V}$ 都是奇數，乘出來居然是偶數，矛盾！因此一定有一個
+點的度數不超過 $k-1$，那因為這個點更本不需考慮，甘脆把他拔掉吧！而又因為這個點
+連通，所以拔掉這個點之後，一定又有一個點的度數變少了，也就是不超過 $k-1$。
+一路做下去，所有的點都被我們拔掉了！
+
+那題目就很簡單了，把最後一個拔掉的點塗隨便一個顏色，再把倒數第二個點塗上任一個合法
+的顏色…一路做回來，我們上面說明了因為每一次的 degree 都不超過 $k-1$，一定能找到一個
+合法的顏色塗！
+
+\subsubsection{邊著色}
+類似地，邊著色就是要把圖上的邊都塗上顏色，使得任一個點連出去的所有邊都不同色。
+邊著色仍然是一個 $\NPC$ 問題！但有一個很神奇的結論。
+
+\begin{theorem}[Vizing's theorem]
+  任意一個簡單圖的邊著色數一定是 $d, d+1$ 中的一個，\\
+  其中 $d = \max\limits_{v \in V} \deg(v)$。
+\end{theorem}
+
+顯然邊著色數至少要 $d$，但 $d+1$ 一定可以著色就沒有那麼顯然了。
+Vizing's theorem 的證明中就給了一個 $d+1$ 著色的演算法，但是滿
+複雜的，有興趣可以到 Wiki 上看看。
+
+\subsection{歐拉路徑/回路}
+給你一張圖，一個歐拉路徑(Euler path)是一條連續的路徑(點可重複)恰好經過所有的邊。
+如果終點恰好回到起點，就稱作是一個歐拉回路。
+
+一筆劃問題就是要問圖上存不存在一條歐拉回路。觀察一下可以發現一個路徑
+$P = (v_1, v_2, \dots, v_n)$，除了起點和終點以外，每個點都會從一個邊
+進去，再從另一條邊出來，總共會「吃掉」這個點 $2$ 個度數。但因點可能
+重複出現在路徑 $P$ 上，因此我們可以知道除了起點/終點外，每個點的度數
+都要是偶數！事實上對於連通圖，這不僅是必要條件，還是充分條件。
+
+\begin{theorem}
+  定義一個{\bf 奇點}是度數為奇數的點。如果圖連通，有
+  \begin{itemize}
+    \item 一個無向圖有歐拉路徑的條件是其奇點的個數是 $0$ 或 $2$。
+    \item 一個無向圖有歐拉迴路的條件是其奇點的個數是 $0$。
+    \item 一個有向圖有歐拉路徑的條件是所有點都滿足 $\deg^+(v) = \deg^-(v)$，
+      或是除此之外有一個點滿足 $\deg^+(v) = \deg^-(v) + 1$，另一個滿足
+      $\deg^+(v) = \deg^-(v) - 1$。
+    \item 一個有向圖有歐拉迴路的條件是所有點都滿足 $\deg^+(v) = \deg^-(v)$，
+  \end{itemize}
+\end{theorem}
+
+
+\SampleProblem{構造字串}{ 
+  問你存不存在一個字串 $S$ 使得子字串 \texttt{`}$ab$\texttt{'} 恰好出現
+  過 $c_{a, b}$ 次，其中 $a, b \in \texttt{`}0123456789\texttt{'}$。
+
+  如 $c_{0, 0} = 2, c_{0, 1} = 1, c_{1, 1} = 1, c_{1, 0}=2$，有字串
+  \texttt{`1100010'}。
+}
+
+如果把字串，如 \texttt{`13413'} 想像做從 $v_1 \to v_3 \to v_4 \to v_1 \to v_3$ 的
+一條路徑，其實原本的題目就是要問你有沒有一條歐拉路徑，計算每一個點的度數即可。
+
+\subsubsection{Hamiltonian path}
+一個 Hamiltonian path 是一個簡單路徑通過所有的點恰好一次。
+雖然看起來跟 Euler path 很像，但卻是一個 $\NPC$ 問題。通常
+的做法是用狀態壓縮 DP ，複雜度是 $\ord{2^V V^2}$。
+
+
+\subsection{匹配問題}
+一個圖的匹配是一個邊集 $E'$，滿足 $E' \subseteq E$ 且每個在圖上的點至多只跟
+$E'$ 裡面的一條邊相鄰。一個最大匹配就是 $\abs{E'}$ 最大的一個匹配。
+\subsubsection{二分圖上的匹配問題}
+二分圖上的最大匹配可以直接轉成最大流問題求解
+\footnote{可以參考「最大流」那一章}。我們這邊用另一種看法來看。
+首先我們定義何謂交錯路徑。
+\begin{theorem}[定義]
+  一個{\bf 交錯路徑}是一個路徑 $P = (x_1, y_1, x_2, y_2, \dots, x_n, y_n)$，滿足
+  \begin{itemize}
+    \item 路徑上的每一條邊都在原圖的邊上。
+    \item $x_1, y_n$ 都還沒有被匹配。
+    \item $(y_k, x_{k+1})$ 都是已經在匹配中的邊。
+    \item $(x_k, y_{k})$ 都是還沒有在匹配中的邊。
+  \end{itemize}
+  找到一條交錯路徑後，把 $(y_k, x_{k+1})$ 共 $n-1$ 個從匹配中移除，
+  並把 $(x_k, y_k)$ 加進匹配中，就是一個大小多 $1$ 的新匹配。
+\end{theorem}
+可以證明一個匹配是最大匹配的條件就是圖上已經不存在交錯路徑，因此我們可以
+不斷的建一棵{\bf 交錯樹}，找交錯路徑增加匹配大小，
+直到不存在交錯路徑為止。詳細的證明和方法用
+flow 的角度來看非常清礎，我們就不在細講。
+
+\subsubsection{一般圖上的匹配問題}
+和二分圖相似，不斷的找交錯路徑擴充。不過不同的是二分圖的交錯路徑 \\
+$P = (x_1, y_1, x_2, y_2, \dots, x_n, y_n)$ 剛好有 
+$x_i \in X, y_i \in Y$，其中 $X, Y$ 是二分圖的一個二分子集(也就是
+$X, Y$ 各自裡面都沒有邊)。一般圖就沒有這種好事了，會造成交錯樹沒有那麼
+好建，會有{\bf 花(Blossom)}的存在。
+
+這時候就要修改演算法成{\bf 縮花演算法(Blossom Algorithm)}，不過縮花演算法
+蠻難寫的，最好是準備一份放在 Codebook 
+\footnote{或許有人不知道，ACM-ICPC 比賽每個隊伍都可以帶約 25 頁單面的 code。}
+裡。
+
+當點數如果不大，可以直接用 $\ord{2^V V^2}$ 狀態壓縮 DP 來解。
+
+\subsubsection{帶權匹配問題}
+有時後邊上會有權重，你要找一組邊權總合最大的匹配。
+
+在二分圖可以直接轉成 Cost-flow 來做，也有從 Dual problem 下手的演算法如
+Hungarian algorithm 。
+
+在一般圖上也有多項式時間的演算法，不過出名的難寫。有一種其妙的假解是
+基於以下觀察
+\begin{theorem}[定義]
+  一個最大帶權匹配中的負環定義為一個交錯環\\
+  $P = (x_1, y_1, x_2, y_2, \dots, x_n, y_n, x_1)$，滿足
+  \begin{itemize}
+    \item $(y_k, x_{k+1}) \; \forall k$ 和 $(y_n, x_1)$ 都是已經在匹配中的邊，
+      把這些邊的權重和叫作 $C_1$。
+    \item $(x_k, y_{k})$ 都是還沒有在匹配中的邊，
+      把這些邊的權重和叫作 $C_2$。
+    \item $C_2 > C_1$
+  \end{itemize}
+  找到一個負環後，把上面 $n$ 個已匹配邊從匹配中移除，
+  其它 $n$ 個加到匹配裡，那新的匹配的權重和更大。
+\end{theorem}
+發揮創意不斷的找負環直到沒有，就是一個最大帶權匹配了。
+
+\subsubsection{一些相關的問題}
+我們這邊列了一些相關的問題。
+\begin{description}[leftmargin=*]
+  \item[最大獨立點集] 一個最大的點集 $V'$ 使得裡面的點都不相鄰。其大小記做 $I(G)$。
+  \item[最大匹配數] 前面定義過了。其大小記做 $M(G)$。
+  \item[最小點覆蓋] 最小的一個點集，使得所有的邊都至少與點集裡的
+    一個點相鄰。\\其大小記做 $C_v(G)$。
+  \item[最小邊覆蓋] 最小的一個邊集，使得所有的點都至少與邊集裡的
+    一個邊相鄰。\\其大小記做 $C_e(G)$。
+\end{description}
+這些問題是很有相關性的，有以下定理：
+\begin{theorem}
+  對於連通圖，有
+  \begin{itemize}
+      \item $I(G) + C_v(G) = \abs{V}$. 
+        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m1}
+      \item $M(G) + C_e(G) = \abs{V}$.
+        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m2}
+      \item 對連通二分圖，有 $M(G) = C_v(G), I(G) = C_e(G)$.
+        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m3}
+  \end{itemize}
+\end{theorem}
+
+\begin{proof}
+  對 \eqref{eq:m1} 我們證明一個獨立點集 $U$ 的補集 $U^c$ 一定是一個點覆蓋。對於所有邊 $(u, v)$，
+  可知 $u, v$ 至少有一個不在 $U$，也就是在 $U^c$，因此 $U^c$ 覆蓋所有邊。
+  這也同時證明了一個點覆蓋 $U$ 的補集 $U^c$ 一定是一個獨立點集。因此 $I(G) + C_v(G) = \abs{V}$。
+
+  對 \eqref{eq:m2} ，我們先證明 $C_e(G) \leq \abs{V} - M(G)$。先找一個最大匹配 $M$，
+  注意到 $M$ 恰好蓋住了 $2\abs{M} = 2 M(G)$ 個點，又因圖連通，可在找 $\abs{V} - 2 M(G)$
+  個邊就把所有點都蓋住了，因此 $C_e(G) \leq \abs{V} - 2 M(G) + M(G) = \abs{V} - M(G)$。
+
+  我們再證明 $C_e(G) \geq \abs{V} - M(G)$，也就是 $M(G) \geq \abs{V} - C_e(G)$。
+  先找一個最小邊覆蓋。這些邊(加上端點)會形成許多連通塊，而對於任一個連通塊，不會有環
+  ，否則隨便拔掉一條環上的邊仍可覆蓋所有點，也就是每個連通塊都是一棵樹。而每一個連
+  通塊任選一條邊，這些選出來的邊都不相鄰，所以是一個匹配。假設連通塊分別為
+  $S_1, S_2, \dots, S_n$，有 $V(S_1) = E(S_1) + 1$。因此
+  \[ M(G) \geq n = \sum V(S_i) - E(S_i) = \sum V(S_i) - \sum E(S_i) = \abs{V} - C_e(G) \]
+  
+  最後證 \eqref{eq:m3}。首先對於一個匹配 $M$ 中的任一個邊，點覆蓋一定要蓋住其中一點，
+  因此 $C_v(G) \geq M(G)$。 現在如果有一個圖 $G$ 滿足 $C_v(G) > M(G)$，找 $\abs{V}, \abs{E}$
+  最小的一個反例。容易證明 $G$ 不是一條路徑或是一個環，因此有一個點 $u$ 的度數至少是 $3$。
+  假設 $u$ 和 $v_1, v_2, v_3$ 相鄰，如果 $G_1 = G \setminus v_1$ 的最大匹配數 $M(G_1) < M(G)$，
+  則因 $C_v(G_1)$ 至少是 $C_v(G) - 1$，有 $M(G_1) \leq M(G) - 1 < C_v(G_1)$，與反例的最小性
+  矛盾。因此存在一個最大匹配 $M$ 使得 $v_1 \notin M$。而 $(u, v_2), (u, v_3)$ 至少有一個
+  不在 $M$ 中，假設是 $e = (u, v_2)$，那考慮 $G_2 = G \setminus e$ 的最小覆蓋 $C$，由反例的最小
+  性有 $M(G) = M(G_2) = C_v(G_2)$，且因為對於一個匹配 $M$ 中的任一個邊，點覆蓋一定要蓋住其中一點，
+  $v_2 \notin C$，從而 $u \in C$ 所以 $C$ 也是 $G$ 的覆蓋，$M(G) = C_v(G)$，矛盾。因此
+  \eqref{eq:m3} 成立。
+\end{proof}
+
+\eqref{eq:m3} 的證明其實沒有給出一個構造點覆蓋的方法，實際的構造方法有些複雜，可以
+參考 Wiki。
+
+\subsection{其它的問題}
+前面講了那麼多種圖論的問題，可以發現圖論問題真的是非常豐富！
+在程式競賽中更可能會出現其它奇奇怪怪的問題，這時候就只能見招拆招了！
+如下面這一題
+
+\SampleProblem{怪圖怪題}{ 
+  一個 Union-Join graph 定義為
+  \begin{itemize}
+    \item 一個點 $v$ 是一個 Union-Join graph.
+    \item 如果 $G, H$ 都是 Union-Join graph，那他們的 Union 
+      \[ G \cup H = (V(G) \cup V(H), E(G) \cup E(H)), \]
+      也是 Union-Join graph.
+    \item 如果 $G, H$ 都是 Union-Join graph，那他們的 Join 
+      \[ G \oplus H = (V(G) \cup V(H), E(G) \cup E(H) \cup E'), \]
+      其中$E' = \{(u, v) : \forall u \in G, v \in H\}$
+      也是 Union-Join graph.
+  \end{itemize}
+
+  現在給你一個 Union-Join graph，你要把每一個點填上一個數字 $c(v)$，使得
+  如果兩個點 $u, v$ 的數字相同，那任何 $u \leadsto v$ 的路徑上，
+  都要有一個點 $w$ 使得 $c(w) < c(u)$。問你至少要用幾個不同的數字。
+}
+
+乍看之下題目無比複雜，但越複雜的題目可能反而是越簡單的題目！首先觀察到這個
+圖是{\bf 被遞迴}的定義出來的，因此我們不妨就猜測，假設最少需要的數字數量是
+$\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
+且如果 $G = G_1 \oplus G_2$，那 $\tau(G) = \tau_\oplus(G_1, G_2)$。
+我們只需要求出 $\tau_\cup, \tau_\oplus$ 這兩個函數是怎麼樣的函數就可以了。
+
+顯然 $\tau_\cup(G_1, G_2) = \max(\tau(G_1), \tau(G_2))$，因為 Union 其實就只
+是把兩張圖擺在一起而已，彼此互不影響。至於 $\tau_\oplus$ 比較複雜，觀察後可以
+發現
+\begin{enumerate}
+  \item  兩邊的點不能有相同的數字，不然 union 就把兩個相同的數字連起來了。
+  \item  Union後只有一邊裡的點可以有相同的數字，另一邊內的點一定要全不相同。
+          不然如果 $G_1$ 中 $u_1, u_2$ 相同， $G_2$ 中 $v_1, v_2$ 相同，
+          如果 $c(u_1) < c(v_1)$，union 後會有路徑
+        $u_1 \to v_1 \to u_2$ 不符合要求，反之亦然。
+\end{enumerate}
+因此由上面討論我們猜想 $\tau_\oplus(G_1, G_2) = \min(\tau(G_1)+\abs{V(G_2)}, 
+\tau(G_2)+\abs{V(G_1)})$。
+由 1. 2. 知道這是下界，而一邊的點 (假設是 $G_1$) 選 $1, 2, \cdots, \abs{V(G_1)}$，一
+邊令 $c(v) = c'(v) + V(G_1)$ 其中 $c'(v)$ 是原先的答案，顯然是一組解，因此這個答案是正確的。
 
 這樣寫好不好呢？其實可以證明這樣的{\bf 期望複雜度}是$\ord{\abs{A}}$。可惜的是，最差的情況可以到$\ord{\abs{A}\abs{B}}$！更糟的是很容易構造出例子，如$A = \mcstr{AAAAA}{AA}, B = \mcstr{AAA}{B}$，這樣雖然$B$從來沒有出現在$A$中，但是每個位置我們都必需匹配到$B$的最後一個字元才能確定匹配失敗！
 那要怎麼改進這個演算法呢？著手點有兩個：
