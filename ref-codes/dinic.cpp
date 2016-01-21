@@ -7,7 +7,7 @@ struct Dinic{
     static const T   INF = 1e9;
     struct Edge{ 
         int v;
-        T   f;
+        T   f;   // residual flow
         int re; 
     };
     int n, s, t, level[MXV];
@@ -20,7 +20,9 @@ struct Dinic{
 #define SZ(x) ((int)(x).size())
     void add_edge(int u, int v, T f){
         E[u].PB({v, f, SZ(E[v])  });
-        E[v].PB({u, f, SZ(E[u])-1});
+        E[v].PB({u, 0, SZ(E[u])-1});
+        // If bidirectional graph
+        // E[v].PB({u, f, SZ(E[u])-1});
     }
     bool BFS(){
         fill(level, level+n, -1);
@@ -41,13 +43,13 @@ struct Dinic{
         if (u == t) return nf;
         T res = 0;
         while (now[u] < SZ(E[u])){
-            Edge &it = E[u][now[u]];
+            Edge &it = E[u][now[u]];    // now[u] = m(u)
             if (it.f > 0 && level[it.v] == level[u]+1){
                 T tf = DFS(it.v, min(nf, it.f));
                 res += tf; nf -= tf; it.f -= tf;
                 E[it.v][it.re].f += tf;
                 if (nf == 0) return res;
-            } else now[u] ++;
+            } else now[u] ++;   // Fail to find a flow
         }
         if (!res) level[u] = -1;
         return res;

@@ -1,0 +1,57 @@
+\begin{subfigure}[b]{0.32\textwidth}
+  \centering
+  \begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+    \foreach \x/\y/\lab/\tx in {
+      0/0/1/$x_i$,
+      1.5/0/2/$\lnot x_i$,
+      0/2/3/$x_j$,
+      1.5/2/4/$\lnot x_j$%
+    } {
+      \node[vertex, inner sep=0pt, minimum size=1cm] (\lab) at (\x, \y) {\tx};
+    }
+    \begin{scope}[every edge/.append style={pos=.5}]
+      \foreach \u/\v in {
+        2/4,
+        3/1%
+      }{
+        \draw[draw,thick,-latex] (\u) edge (\v);
+      }
+    \end{scope}
+  \end{tikzpicture}
+  \caption{$(x_i \lor \lnot x_j)$}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}
+  \centering
+  \begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+    \foreach \x/\y/\lab/\tx in {
+      0/0/1/$x_i$,
+      1.5/0/2/$\lnot x_i$,
+      0/2/3/$x_j$,
+      1.5/2/4/$\lnot x_j$%
+    } {
+      \node[vertex, inner sep=0pt, minimum size=1cm] (\lab) at (\x, \y) {\tx};
+    }
+    \begin{scope}[every edge/.append style={pos=.5}]
+      \draw[draw,thick,-latex, bend left] (2) edge (3);
+      \draw[draw,thick,-latex, bend left] (4) edge (1);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{$(x_i \lor x_j)$}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}
+  \centering
+  \begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+    \foreach \x/\y/\lab/\tx in {
+      0/0/1/$x_i$,
+      1.5/0/2/$\lnot x_i$,
+      0/2/3/$x_j$,
+      1.5/2/4/$\lnot x_j$%
+    } {
+      \node[vertex, inner sep=0pt, minimum size=1cm] (\lab) at (\x, \y) {\tx};
+    }
+    \begin{scope}[every edge/.append style={pos=.5}]
+      \draw[draw,thick,-latex] (2) edge (1);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{$(x_i \lor x_i)$}
+\end{subfigure}

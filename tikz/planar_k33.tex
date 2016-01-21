@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1.2cm,y=1.8cm]
+  \foreach \x/\y/\lab in {
+    0/0/x1,
+    1/0/x2,
+    2/0/x3,
+    0/1/y1,
+    1/1/y2,
+    2/1/y3%
+  } {
+    \node[vertex, minimum size=.6cm] (\lab) at (\x, \y) {};
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u in {1,2,3} {
+      \foreach \v in {1,2,3} {
+        \draw[draw,thick] (x\u) edge (y\v);
+      }
+    }
+  \end{scope}
+\end{tikzpicture}

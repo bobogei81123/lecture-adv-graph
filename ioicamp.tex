@@ -522,4 +522,18 @@
 }
 \makeatother
 
+\usepackage{caption}
+\usepackage{csquotes}
+\usetikzlibrary{patterns}
+\DeclareCaptionLabelFormat{cfig}{圖#2}
+\captionsetup{labelformat=cfig}
+\tikzset{vertex/.style={circle, draw, thick, minimum size=.8cm}}
+\tikzset{source/.style={vertex, fill=black!20}}
+\tikzset{fed/.style={draw, -latex, thick}}
+\tikzset{%
+  apply style/.code={%
+    \tikzset{#1}%
+  }
+}
+
 \usepackage{wasysym} % add by seanwu

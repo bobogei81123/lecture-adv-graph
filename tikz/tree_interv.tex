@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1.5cm,y=-1.2cm]
+  \foreach \e/\s/\y in {
+    1/1/2,
+    2/2/3,
+    3/3/3,
+    4/2/2,
+    5/1/1,
+    6/6/2,
+    7/6/1,
+    8/1/0%
+  } {
+    \node[vertex, inner sep=1pt] (\e) at (\e, \y) {$[\s, \e]$};
+    \node at (\e, -.8) {$\e$};
+  }
+  \foreach \x in {0.5,..., 8.5} {
+    \draw[thick, dashed] (\x, -1) -- (\x, 3.5);
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u/\v in {
+      1/5,
+      2/4,
+      3/4,
+      4/5,
+      5/8,
+      6/7,
+      7/8%
+    }{
+      \draw[draw,thick] (\u) edge (\v);
+    }
+  \end{scope}
+\end{tikzpicture}

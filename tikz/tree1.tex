@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+  \foreach \x/\y/\name/\lab in {
+    0/0//v1,
+    1/1//v2,
+    -1.0/1.4//v3,
+    .5/2.3//v4,
+    2.0/2.1//v5,
+    -1.6/0.5//v6%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {\name};
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u/\v in {
+      v1/v2,
+      v1/v3,
+      v2/v4,
+      v2/v5,
+      v1/v6%
+    }{
+      \draw[draw,thick] (\u) edge (\v);
+    }
+  \end{scope}
+\end{tikzpicture}

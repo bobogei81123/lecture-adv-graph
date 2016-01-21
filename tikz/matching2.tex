@@ -1,0 +1,54 @@
+\begin{tikzpicture}[x=1.1cm,y=-1.1cm]
+  \foreach \x/\y/\name/\lab in {
+    0/0/$v_1$/v1,
+    1/0/$v_2$/v2,
+    2/0/$v_3$/v3,
+    3/0/$v_4$/v4,
+    0/2/$u_1$/u1,
+    1/2/$u_2$/u2,
+    2/2/$u_3$/u3,
+    3/2/$u_4$/u4%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {\name};
+  }
+  \begin{scope}[every edge/.append style={pos=.5},
+    bold/.append style={line width=1mm}]
+    \foreach \u/\v/\style in {
+      v1/u1/{},
+      v1/u2/{bold},
+      v2/u2/{},
+      v3/u1/{bold},
+      v3/u2/{},
+      v3/u3/{},
+      v4/u3/{},
+      v4/u4/{bold}%
+    }{
+      \draw[draw,thick] (\u) edge[apply style/.expand once=\style] (\v);
+    }
+  \end{scope}
+\end{tikzpicture}
+\hspace*{1cm}
+\begin{tikzpicture}[x=1.6cm,y=-1.2cm]
+  \foreach \x/\y/\name/\lab in {
+    0/0/$v_2$/1,
+    1/0/$u_2$/2,
+    2/0/$v_1$/3,
+    3/0/$u_1$/4,
+    4/0/$v_3$/5,
+    5/0/$u_3$/6%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {\name};
+  }
+  \begin{scope}[every edge/.append style={pos=.5},
+    bold/.append style={line width=1mm}]
+    \foreach \u/\v/\style in {
+      1/2/{},
+      2/3/{bold},
+      3/4/{},
+      4/5/{bold},
+      5/6/{}%
+    }{
+      \draw[draw,thick] (\u) edge[apply style/.expand once=\style] (\v);
+    }
+  \end{scope}
+\end{tikzpicture}

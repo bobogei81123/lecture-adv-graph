@@ -1,0 +1,33 @@
+\begin{tikzpicture}[x=1.2cm,y=-1.2cm]
+  \foreach \x/\y/\lab in {
+    0/0/v1,
+    1/0/v2,
+    2/0/v3,
+    3/0/v4,
+    4/0/v5,
+    0/2/u1,
+    1/2/u2,
+    2/2/u3,
+    3/2/u4,
+    4/2/u5%
+  } {
+    \node[vertex] (\lab) at (\x, \y) {};
+  }
+  \begin{scope}[every edge/.append style={pos=.5}]
+    \foreach \u/\v in {
+      v1/u1,
+      v1/u2,
+      v1/u4,
+      v2/u2,
+      v2/u5,
+      v3/u1,
+      v3/u2,
+      v3/u5,
+      v4/u3,
+      v5/u4,
+      v5/u5%
+    }{
+      \draw[draw,thick] (\u) edge (\v);
+    }
+  \end{scope}
+\end{tikzpicture}

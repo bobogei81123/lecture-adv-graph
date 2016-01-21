@@ -36,6 +36,10 @@
 \subsection{樹}
 一個沒有環的連通圖就是一棵樹。相信大家對樹的性質都已經很熟悉，因此
 這邊介紹一些進階的技巧。
+\begin{figure}[H]
+  \centering
+  \input{tikz/tree1.tex}
+\end{figure}
 
 \subsubsection{樹的子樹區間}
 俗稱的「把樹壓平」，其實就是希望對於每一個點 $v$ ，都定出 $L_v, R_v$，
@@ -51,7 +55,12 @@ $L_v \leq L_u \leq R_u \leq R_v$。
   \end{itemize}
   得出的 $L_v, R_v$ 便是一個合理的子樹區間。
 \end{theorem}
-這可以用來解決不少區間查尋的問題
+\begin{figure}[H]
+  \centering
+  \input{tikz/tree_interv.tex}
+  \caption{樹的區間化的一個例子}
+\end{figure}
+這可以用來解決不少區間查詢的問題
 
 \SampleProblem[經典問題]{樹上查詢}{
 	給定一棵$N$個點的有根帶點權樹，接著$Q$個操作，每次操作可能是：
@@ -84,7 +93,7 @@ $f(n) = n$ 則 $T(n) = n \log n$。因此 $v$ 的選擇就很重要了，
   子樹的大小都不超過原來的樹大小的一半。
 \end{theorem}
 \begin{proof}
-  定義 $c(v)$ 為 $v$ 到所有其他點的距離的合。則使 $c(u)$ 最小
+  定義 $c(v)$ 為 $v$ 到所有其他點的距離的和。則使 $c(u)$ 最小
   的那個點一定是重心。否則假設本來 $(u, v)$ 相鄰，且拔掉 $u$ 
   後 $v$ 所屬的子樹的大小大於一半，比較 $c(u), c(v)$ 可以發現
   有超過一半的點到 $u$ 的距離比到 $v$ 近 $1$，而不超過一半的點
@@ -124,8 +133,20 @@ $f(n) = n$ 則 $T(n) = n \log n$。因此 $v$ 的選擇就很重要了，
   因此總複雜度是 $n \log(n) f(n)$。
 \end{proof}
 
+如上一節的例題，假設一個點 $u$ 的子節點為 $v_1, v_2, \cdots, v_k$，
+先遞迴下去這些子節點，每個子節點都維護一個線段樹的結構儲存以 $v_i$
+為起始的路徑的長度，合併時我們就挑一個最大的子樹，假設是 $v_1$，把
+其他點線段樹裡的路徑一一加到 $v_1$ 的線段樹中，順便計算答案即可。
+
+
 \subsection{平面圖}
 {\bf 平面圖}就是可以畫在平面上的圖，使得任兩個邊只會在點上相交而已。
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/planar1.tex}
+  \caption{一個平面圖的例子}
+\end{figure}
 
 而平面圖有一個很重要的定理。
 \begin{theorem}[定理 (歐拉定理)]
@@ -180,29 +201,59 @@ $\deg(v_2) \leq 5$。一路做下去我們就得到了一個 $\ord{V}$ 的做法
 這裡再總結一下平面圖的一些結論。
 
 \begin{theorem}[定理]
-  定義一個圖的 degeneracy 為 $\min \deg(v)$，則平面圖的 degeneracy $\leq 5$。
+  所有平面圖都存在一個點 $v$ 使得他的 $\deg(v) \leq 5$。
 \end{theorem}
 
 \begin{theorem}[定理]
   一個圖是平面圖的條件若且唯若 $K_5, K_{3, 3}$ 不是他的 minor。
-  $G$ 是 $H$ 的 minor 表示 $G$ 可以由
+  $G$ 是 $H$ 的 minor 表示 $G$ 可以由 $H$
   \begin{itemize}
     \item 刪掉一條邊
     \item 刪掉一個點
     \item 收縮一條邊，也就是把兩個點合併。
   \end{itemize}
   得到。
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \input{tikz/planar_k5.tex}
+    \caption{$K_5$}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \input{tikz/planar_k33.tex}
+    \caption{$K_{3, 3}$}
+  \end{subfigure}
+\end{figure}
 \end{theorem}
+
 
 \subsection{競賽圖}
 一個競賽圖是一個有向圖，且 $(u, v), (v, u)$ 恰好有一個在 $E$ 中。
-可以想成是「有向完全圖」。競賽圖也有許多有趣的性質，如以下這個例題。
 
-\SampleProblem{競賽圖的 Hamilton Path}{
-  給你一個競賽圖，求他的 Hamilton Path。
+\begin{minipage}{0.49\textwidth}
+\begin{figure}[H]
+  \centering
+  \input{tikz/compete.tex}
+  \caption{一個競賽圖的例子}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{figure}[H]
+  \centering
+  \input{tikz/compete_hamilton.tex}
+  \caption{左圖的一個 Hamiltonian path}
+\end{figure}
+\end{minipage} \\
+
+可以把競賽圖想成是「有向完全圖」。競賽圖也有許多有趣的性質，如以下這個例題。
+
+\SampleProblem{競賽圖的 Hamiltonian Path}{
+  給你一個競賽圖，求他的 Hamiltonian Path。
 }
 如果你把競賽圖想成是「兩兩對局結果」，也就是如果 $u \to v$
-就表示 $u$ 贏 $v$，那一個 Hamilton path 其實就是一個「幾乎」
+就表示 $u$ 贏 $v$，那一個 Hamiltonian path 其實就是一個「幾乎」
 \footnote{會說「幾乎」的原因是因為這個關係不一定有傳遞性，也就是
 $(u \to v) \land (v \to w) \centernot\implies u \to w$。}
 正確的強度順序，因此我們不如往排序的方向想。
@@ -212,34 +263,41 @@ $(u \to v) \land (v \to w) \centernot\implies u \to w$。}
 的點 $u$ 挑出來，也就是 $v \to u \in E$ 的點。假說這個集合是 $A$，
 那 $\bar{A} \setminus v$ 裡的點 $w$ 由競賽圖的性質可以知道 
 $w \to v \in E$，因此我們只要遞迴下去做 $A, \bar{A}$，最後用
-$v$ 這個點把他們兩個的 Hamilton path 串起來就可以了！
+$v$ 這個點把他們兩個的 Hamiltonian path 串起來就可以了！
 
 有趣的是這題用「幾乎所有的排序法」都會對，如 Merge sort 或是 
 Insertion sort 等等。
+讀者不妨試著證明看看。
 
 \subsection{二分圖}
 如果一個圖可以被分成兩個點集 $U, V$ 使得任兩個點 $u, v$ 如果在
 同一個集合的話，他們之間一定沒有邊，即 $(u, v) \notin E$，則我們
 就稱這個圖是一個二分圖。這也等價於可以被二著色，且相鄰的點不同色。
 
+\begin{figure}[H]
+  \centering
+  \input{tikz/bi.tex}
+  \caption{一個二分圖的例子}
+\end{figure}
+
 要判斷一個圖是否是二分圖，一個最簡單的方法就是把這個二分圖遞迴黑白染色，
-也就是從一個點 $u$ 開始，把 $u$ 先圖成白色，再把其周圍的點圖成黑色，然後
+也就是從一個點 $u$ 開始，把 $u$ 先塗成白色，再把其周圍的點塗成黑色，然後
 把距離 $2$ 的點都塗成白色…依此類推，最後再檢查是不是每一個邊的兩端都不同
 色即可。
 
 另一個做法是用{\bf 併查集}，對每一個點 $u$ 都建兩個對應的點，$u_0, u_1$。可以把
 $u_0$ 想做是「你的顏色」，$u_1$ 則是「非你的顏色」。對於每一條邊 $(u, v)$，
-我們就把 $(u_0, v_1), (u_1 v_0)$ 做併查集的合併，意思就是「$u$ 的顏色是非 $v$ 的
+我們就把 $(u_0, v_1), (u_1, v_0)$ 做併查集的合併，意思就是「$u$ 的顏色是非 $v$ 的
 顏色」，而圖是二分圖的條件即是每個點 $u$ 對應到的兩個新點 $u_0, u_1$ 都在不同的
 併查集裡，如以下這個例題。
 
 \SampleProblem[TIOJ 1672]{分子碰撞實驗}{
-  現在有一個未知的序列 $a_1, a_2, \dots, a_n$，依序給你些個資訊 $(s, t, p)$，
+  現在有一個未知的序列 $a_1, a_2, \dots, a_n$，依序給你資訊 $(s, t, p)$，
   其中 $p \in \{0, 1\}$ 代表 $a_s + a_{s+1} + \dots + a_t \equiv p \pmod{2}$，
   每次你要判斷給你的資訊會不會和已知的資訊有所矛盾，並且如果有矛盾則捨棄之。
 }
 
-如果我們令 $b_i = \sum\limits_{0}^{i-1} a_j$，可以發現每次的資訊其實就是在告訴你
+如果我們令 $b_i = \sum\limits_{j=0}^{i-1} a_j$，可以發現每次的資訊其實就是在告訴你
 $a_{s-1}$ 和 $a_t$ 的奇偶性是相同還是相異。因此我們就修改上述的做法就可以了！
 假設 $u = a_{s-1}$ 且 $v = a_t$ 並用剛才的記號，如果他們同奇偶則檢查 $(u_0, v_1)$
 是否在不同的集合裡，是的話再合併 $(u_0, v_0), (u_1, v_1)$，反之亦然。
@@ -257,7 +315,7 @@ $a_{s-1}$ 和 $a_t$ 的奇偶性是相同還是相異。因此我們就修改上
 法可以求出這個問題的答案。比如排序問題，最短路徑問題等等。
 
 但是有一些問題，人們想破頭了都想不出一個多項式時間的演算法可以解出，
-比如求一個圖的 Hamilton Path 至今都還沒有一個好的演算法解決他，而且
+比如求一個圖的 Hamiltonian Path 至今都還沒有一個好的演算法解決他，而且
 也沒有辦法證明不存在一個多項式時間的演算法解決他。
 
 百般無奈的人們只好先假設我們有一個更加強大的計算體系了，也就是
@@ -266,43 +324,43 @@ $a_{s-1}$ 和 $a_t$ 的奇偶性是相同還是相異。因此我們就修改上
 在介紹什麼是非確定性圖靈機之前，我們先定義一個合法的問題是什麼。
 在這邊我們先只考慮{\bf 判定性問題}。什麼是判定性問題呢？其實就是
 答案只有 Yes, No 兩種的問題，比如說「這個圖上是不是存在一個 
-Hamilton path 呢？」或是「這個圖是不是一個平面圖？」等等。
+Hamiltonian path 呢？」或是「這個圖是不是一個平面圖？」等等。
 至於「從 $u$ 到 $v$ 的最短路徑長度是多少？」就不是判定性問題了。
 但是我們大可以把他轉成「從 $u$ 到 $v$ 的最短路徑長度是否小於 $k$？」
 這個判定性問題，然後用比如說二分搜的方法解出原本的問題。
 
 而非確定性圖靈機強大的地方就在於，
 有別於我們電腦等等的{\bf 確定性圖靈機}的計算體系，在進行搜索時有
-時後我們要面臨抉擇。比如說在找一個圖的 Hamilton path 時，我們不知道
+時後我們要面臨抉擇。比如說在找一個圖的 Hamiltonian path 時，我們不知道
 起點應該是 $v_1, v_2, \dots$ 裡的哪一個，於是只好一個個試過一遍。
 非確定性圖靈機在面臨這種情況時，如果答案是「有解存在」的，他一定會
 {\bf 很幸運的選到一個最好的選擇}。
 
 於是我們把所有用確定性圖靈機可以在多項式時間內解出的題目的集合稱作
-$\P$，把所有用確定性圖靈機可以在多項式時間內解出的題目的集合就稱作
+$\P$，把所有非確定性圖靈機可以在多項式時間內解出的題目的集合就稱作
 $\NP$。%
 \footnote{所以 $\NP$ 並不是 Non-Polynomial 的縮寫，而是
   Non-deterministic Polynomial 的縮寫。}
 在經過一番推敲後我們發現{\bf 一個判定性問題是 $\NP$ 問題若且唯若如果
 答案是 Yes，他的一個解 可以在多項式時間被一個內被一個確定性圖靈機驗證}。
-比如說 Hamilton Path 是 $\NP$ 問題，因為今天如果有人宣稱 $P$ 是一個 
-Hamiltom Path，那你只要 確認 $P$ 通過所有點恰好一次，
+比如說 Hamiltonian Path 是 $\NP$ 問題，因為今天如果有人宣稱 $P$ 是一個 
+Hamiltonian Path，那你只要 確認 $P$ 通過所有點恰好一次，
 而且每一條邊都存在於原本的圖中即可。
 
 定義了 $\NP$ 後，人們就開始問，$\NP$ 裡最難的問題是什麼呢？我們說一個
 問題 $A$ 比 $B$ 難表示 $B$ 可以化簡成 $A$，也就是說{\bf 如果我們要
   解 $B$ 問題，我們可以把 $B$ 在多項式時間內作一些轉化，把他變成 $A$ 問
-  題。} 比如我們可以證明找一個 Hamilton Cycle 比找 Hamilton Path 還難，
-因為如果要找 Hamilton Path，我們可以再原圖多加一個點 $v$ ，然後把 $v$ 
-建邊連到所有點。這樣原圖的一個 Hamilton Path 一定可以頭尾用 $v$ 串起來
-變成 Hamilton Cycle。而在新的圖如果找到了一個 Hamilton Cycle，只要把
-Cycle 中的 $v$ 去掉，就是原本 Hamilton Path 的解了。
+  題。} 比如我們可以證明找一個 Hamiltonian Cycle 比找 Hamiltonian Path 還難，
+因為如果要找 Hamiltonian Path，我們可以再原圖多加一個點 $v$ ，然後把 $v$ 
+建邊連到所有點。這樣原圖的一個 Hamiltonian Path 一定可以頭尾用 $v$ 串起來
+變成 Hamiltonian Cycle。而在新的圖如果找到了一個 Hamiltonian Cycle，只要把
+Cycle 中的 $v$ 去掉，就是原本 Hamiltonian Path 的解了。
 
-也就是說，如果你會解 Hamilton Cycle，那你一定也能解 Hamilton Path。因此
+也就是說，如果你會解 Hamiltonian Cycle，那你一定也能解 Hamiltonian Path。因此
 $\NP$ 裡「最難」的問題就代表{\bf 如果你會解這個問題，那所有 $\NP$ 問題都可
-  以在多項式時間化簡為這個問題。}不過「最難」的問題真的存在嗎？有的！其實
-以經有許多問題被證明是「最難」的 $\NP$ 問題了，如 3-SAT、最大團還
-有剛剛說的 Hamilton Path 等都是！我們把這些問題叫作 $\NPC$ ($\NP$-complete)
+  以在多項式時間轉化為這個問題。}不過「最難」的問題真的存在嗎？有的！其實
+已經有許多問題被證明是「最難」的 $\NP$ 問題了，如 3-SAT、最大團還
+有剛剛說的 Hamiltonian Path 等都是！我們把這些問題叫作 $\NPC$ ($\NP$-complete)
 問題。
 
 而如果我們有一天找到了一個可以在多項式時間內解出某一個 $\NPC$ 問題的演算法，
@@ -315,7 +373,7 @@ $\NP$ 裡「最難」的問題就代表{\bf 如果你會解這個問題，那所
 \subsubsection{這和競賽解題有何關係？}
 有的！這往往可以幫助你往正確的方向思考。在解題的過程中我們往往會把題目做一些
 變換，轉成其他的題目來解。而如果你發現你轉成了一個 $\NPC$ 問題，除非測資範圍
-很小，否則通常表示你一定有什麼題目的性質沒有用到，要從新思考思路！比如前面說
+很小，否則通常表示你一定有什麼題目的性質沒有用到，要重新思考！比如前面說
 的「平面圖最大團」問題，一般圖的最大團問題是 $\NPC$，因此關鍵一定在平面圖的
 性質上！
 
@@ -330,7 +388,7 @@ $\NP$ 裡「最難」的問題就代表{\bf 如果你會解這個問題，那所
   問你是否可以給每一個變數 $x_i$ 一個 \texttt{true} 或是 \texttt{false} 
   值使得原本的布林代數式的結果為 \texttt{true}？
 }
-這個問題有一個很 well known 的解法，對於每個刮號，假設是 $(x_3 \lor \lnot x_4)$
+這個問題有一個很 well known 的解法，對於每個括號，假設是 $(x_3 \lor \lnot x_4)$
 好了，代表不是 $x_3 = \texttt{true}$，就是 $x_4 = \texttt{false}$。也就是
 \begin{itemize}
   \item 如果 $x_3 = \texttt{false}$，那必定有 $x_4 = \texttt{false}$，用邏輯的語言
@@ -350,6 +408,11 @@ $x_3 \rightarrow x_4$，但沒有強迫 $x_4 \to x_3$。
   $\lnot x_i \to x_i \equiv (\lnot \lnot x_i) \lor x_i \equiv x_i$
 }
 類似的 $(\lnot x_i, \lnot x_i)$ 就建 $x_i \to \lnot x_i$。
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/sat1.tex}
+\end{figure}
 
 最後可以發現如果在圖上 $u$ 可以走到 $v$，表示如果「選了」$u$ 就一定要選 $v$，
 因此可以想像有解的條件就是對於所有 $x_i, \lnot x_i$，要嘛 $u$ 不能走到 $v$，
@@ -378,7 +441,7 @@ $j$ 排要炸與否，那這些規定其實就是
   轉成 2-SAT 解即可！
 
 \subsubsection{3-SAT}
-很不幸的 3-SAT 問題，也就是每個刮號可能有三個變數，雖然好像只差一點
+很不幸的，對於 3-SAT 問題也就是每個括號可能有三個變數，雖然好像只差一點
 卻是個 $\NPC$ 問題。不過並不是 $\NPC$ 問題
 就不值得研究或是優化，有好的搜索方法還是會差很多！現在有些 SAT-solver 在一般沒有設計過的
 測資 (如電路等等) 似乎跑到 $10^4$ 個變數都不是問題，好像也是目前在解如電路等價等等
@@ -387,6 +450,13 @@ $j$ 排要炸與否，那這些規定其實就是
 \subsection{著色問題}
 \subsubsection{點著色}
 點著色就是要把圖上的點都塗上顏色，使得相鄰的點都要不同色，並要求用的顏色越少越好。
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/color1.tex}
+  \caption{一個 $3$ 著色的例子}
+\end{figure}
+
 如果最少用 $k$ 個顏色就足夠了，我們就稱這個圖的著色數為 $k$。
 點著色是 $\NPC$ 問題，但是在特殊的圖可能會有特殊的方法。比如大家都熟悉的四色定理
 
@@ -401,12 +471,12 @@ $j$ 排要炸與否，那這些規定其實就是
 }
 
 其實畫一畫會發現，因為度數最高是 $k$，要把一個圖 $k$ 著色其實非常容易。如果
-一個點的度數小於 $k$，也就是最多 $k-1$，那我們跟本不用考慮這個點，等其它點都
+一個點的度數小於 $k$，也就是最多 $k-1$，那我們根本不用考慮這個點，等其它點都
 塗色了以後，再找一個顏色不在其 $k-1$ 個鄰居中就可以了。
 
-那會不會所有點的 degree 都是 $k$ 呢？不會！否則所有點的度數合是 $k\abs{V}$，這個
+那會不會所有點的 degree 都是 $k$ 呢？不會！否則所有點的度數和是 $k\abs{V}$，這個
 等於 $2 \abs{E}$，但 $k, \abs{V}$ 都是奇數，乘出來居然是偶數，矛盾！因此一定有一個
-點的度數不超過 $k-1$，那因為這個點更本不需考慮，甘脆把他拔掉吧！而又因為這個點
+點的度數不超過 $k-1$，那因為這個點更本不需考慮，乾脆把他拔掉！而又因為這個點
 連通，所以拔掉這個點之後，一定又有一個點的度數變少了，也就是不超過 $k-1$。
 一路做下去，所有的點都被我們拔掉了！
 
@@ -430,6 +500,12 @@ Vizing's theorem 的證明中就給了一個 $d+1$ 著色的演算法，但是�
 \subsection{歐拉路徑/回路}
 給你一張圖，一個歐拉路徑(Euler path)是一條連續的路徑(點可重複)恰好經過所有的邊。
 如果終點恰好回到起點，就稱作是一個歐拉回路。
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/euler.tex}
+  \caption{一個 Euler path}
+\end{figure}
 
 一筆劃問題就是要問圖上存不存在一條歐拉回路。觀察一下可以發現一個路徑
 $P = (v_1, v_2, \dots, v_n)$，除了起點和終點以外，每個點都會從一個邊
@@ -466,10 +542,23 @@ $P = (v_1, v_2, \dots, v_n)$，除了起點和終點以外，每個點都會從�
 雖然看起來跟 Euler path 很像，但卻是一個 $\NPC$ 問題。通常
 的做法是用狀態壓縮 DP ，複雜度是 $\ord{2^V V^2}$。
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.25\textwidth]{tikz/hamilt.png}
+  \caption{一個 Hamiltonian cycle}
+\end{figure}
+
 
 \subsection{匹配問題}
 一個圖的匹配是一個邊集 $E'$，滿足 $E' \subseteq E$ 且每個在圖上的點至多只跟
 $E'$ 裡面的一條邊相鄰。一個最大匹配就是 $\abs{E'}$ 最大的一個匹配。
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/matching.tex}
+  \caption{一個匹配的例子}
+\end{figure}
+
 \subsubsection{二分圖上的匹配問題}
 二分圖上的最大匹配可以直接轉成最大流問題求解
 \footnote{可以參考「最大流」那一章}。我們這邊用另一種看法來看。
@@ -485,10 +574,16 @@ $E'$ 裡面的一條邊相鄰。一個最大匹配就是 $\abs{E'}$ 最大的一
   找到一條交錯路徑後，把 $(y_k, x_{k+1})$ 共 $n-1$ 個從匹配中移除，
   並把 $(x_k, y_k)$ 加進匹配中，就是一個大小多 $1$ 的新匹配。
 \end{theorem}
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/matching2.tex}
+\end{figure}
+
 可以證明一個匹配是最大匹配的條件就是圖上已經不存在交錯路徑，因此我們可以
 不斷的建一棵{\bf 交錯樹}，找交錯路徑增加匹配大小，
 直到不存在交錯路徑為止。詳細的證明和方法用
-flow 的角度來看非常清礎，我們就不在細講。
+flow 的角度來看非常清楚，我們就不再細講。
 
 \subsubsection{一般圖上的匹配問題}
 和二分圖相似，不斷的找交錯路徑擴充。不過不同的是二分圖的交錯路徑 \\
@@ -505,12 +600,12 @@ $X, Y$ 各自裡面都沒有邊)。一般圖就沒有這種好事了，會造成
 當點數如果不大，可以直接用 $\ord{2^V V^2}$ 狀態壓縮 DP 來解。
 
 \subsubsection{帶權匹配問題}
-有時後邊上會有權重，你要找一組邊權總合最大的匹配。
+有時候邊上會有權重，你要找一組邊權總合最大的匹配。
 
 在二分圖可以直接轉成 Cost-flow 來做，也有從 Dual problem 下手的演算法如
 Hungarian algorithm 。
 
-在一般圖上也有多項式時間的演算法，不過出名的難寫。有一種其妙的假解是
+在一般圖上也有多項式時間的演算法，不過出名的難寫。有一種奇妙的假解是
 基於以下觀察
 \begin{theorem}[定義]
   一個最大帶權匹配中的負環定義為一個交錯環\\
@@ -549,16 +644,21 @@ Hungarian algorithm 。
   \item[最小邊覆蓋] 最小的一個邊集，使得所有的點都至少與邊集裡的
     一個邊相鄰。\\其大小記做 $C_e(G)$。
 \end{description}
+
+\begin{figure}[H]
+  \centering
+  \input{tikz/misc.tex}
+\end{figure}
 這些問題是很有相關性的，有以下定理：
 \begin{theorem}
   對於連通圖，有
   \begin{itemize}
       \item $I(G) + C_v(G) = \abs{V}$. 
-        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m1}
+        \listeqn \label{eq:m1}
       \item $M(G) + C_e(G) = \abs{V}$.
-        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m2}
+        \listeqn \label{eq:m2}
       \item 對連通二分圖，有 $M(G) = C_v(G), I(G) = C_e(G)$.
-        \refstepcounter{equation} \hfill{}(\theequation)\label{eq:m3}
+        \listeqn \label{eq:m3}
   \end{itemize}
 \end{theorem}
 
@@ -568,7 +668,7 @@ Hungarian algorithm 。
   這也同時證明了一個點覆蓋 $U$ 的補集 $U^c$ 一定是一個獨立點集。因此 $I(G) + C_v(G) = \abs{V}$。
 
   對 \eqref{eq:m2} ，我們先證明 $C_e(G) \leq \abs{V} - M(G)$。先找一個最大匹配 $M$，
-  注意到 $M$ 恰好蓋住了 $2\abs{M} = 2 M(G)$ 個點，又因圖連通，可在找 $\abs{V} - 2 M(G)$
+  注意到 $M$ 恰好蓋住了 $2\abs{M} = 2 M(G)$ 個點，又因圖連通，可再找 $\abs{V} - 2 M(G)$
   個邊就把所有點都蓋住了，因此 $C_e(G) \leq \abs{V} - 2 M(G) + M(G) = \abs{V} - M(G)$。
 
   我們再證明 $C_e(G) \geq \abs{V} - M(G)$，也就是 $M(G) \geq \abs{V} - C_e(G)$。
@@ -623,18 +723,18 @@ $f(n)$ 表示 $n$ 個點的二元樹個數，有
   我們只要能證明一個樹可以一對一到一個這樣的序列，一個這樣的序列也一定可以還原成一棵樹即可。
 
   注意到如果 $\deg(v) = k$，那 $v$ 就會在序列中出現 $k-1$ 次。當兩個樹 $T_1, T_2$ 對
-  映到的序列 $A_1, A_2$ 相同，如果 $\abs{T_1} = 2$，那這兩個樹肯定相同。 接下來我們用數學規納法，
+  應到的序列 $A_1, A_2$ 相同，如果 $\abs{T_1} = 2$，那這兩個樹肯定相同。 接下來我們用數學歸納法，
   假設這兩個樹的大小為 $k$，現在考慮他們編號最小的葉子 $u_1, u_2$，一定有 $u_1 = u_2$，
   否則假設 $u_1 < u_2$ ，那 $u_1$ 不會出現在 $a_1$ 裡但不會出現在 $a_2$ 理。
-  接著因為序列的第一項相同，$u_1, u_2$ 也要接到相同的點，拔掉這個點後由規納假設，兩棵樹仍相同，
-  因此 $T_1 = T_2$，也就是不同的樹會對映到不同的序列。
+  接著因為序列的第一項相同，$u_1, u_2$ 也要接到相同的點，拔掉這個點後由歸納假設，兩棵樹仍相同，
+  因此 $T_1 = T_2$，也就是不同的樹會對應到不同的序列。
 
   還原的方法也很簡單，如果 $n = 2$ 那只有一種可能的樹，就是 $1, 2$ 接在一起。
   假設我們要還原 $n = k$，也就是序列 $A$ 長度是 $k - 2$，我們找最小的編號 $u$ 使得
   $u$ 沒有出現在 $A$ 裡，先遞迴建出 $A' = (a_2, a_3, \dots, a_n)$ 的樹，把 $u$ 接
   上 $a_1$ 即可。
 
-  因此一個樹可以一對一且映成對到這樣的序列，容易計算這樣的序列有 $n^{n-2}$ 種！
+  總結以上，生成樹的個數就和序列的個數一樣，容易計算這樣的序列有 $n^{n-2}$ 種！
 \end{proof}
 
 再看一個比較不一樣的題目
@@ -650,9 +750,9 @@ $f(n)$ 表示 $n$ 個點的二元樹個數，有
 $k$ 大，我們就直接用第一種方法枚舉，注意到這種點只會有 $\ord{\sqrt{E}}$ 個，所以
 複雜度是 $\ord{E \sqrt{E}}$。接下來用第二種方法枚舉，對一個邊 $(v_1, v_2)$，如果
 $\deg(v_1) > k, \deq(v_2) > k$ 就捨棄，如果有一個，假設是 $v_2, \deg(v_2) < k$，
-我們就在枚舉 $v_2$ 的鄰居，雜度是 $\ord{E \sqrt{E}}$。
+我們就再枚舉 $v_2$ 的鄰居，複雜度是 $\ord{E \sqrt{E}}$。
 
-因此三角形有一個點的度數比 $k$ 小，一定會在上面被枚舉到，全部都比 $k$ 大我們第一
+因此三角形有一個點的度數比 $k$ 小，一定會再上面被枚舉到，全部都比 $k$ 大我們第一
 種方法也枚舉到了，經過適當的排容，總複雜度是 $\ord{E \sqrt{E}}$。
 
 去年的講義資料分治(Square root method)有更詳細的說明。
@@ -662,7 +762,7 @@ $\deg(v_1) > k, \deq(v_2) > k$ 就捨棄，如果有一個，假設是 $v_2, \de
 在程式競賽中更可能會出現其它奇奇怪怪的問題，這時候就只能見招拆招了！
 如下面這一題
 
-\SampleProblem{怪圖怪題}{ 
+\SampleProblem[ACM ICPC Taipei regional pI]{怪圖怪題}{ 
   一個 Union-Join graph 定義為
   \begin{itemize}
     \item 一個點 $v$ 是一個 Union-Join graph.
@@ -729,24 +829,24 @@ $\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
 
     \ExerciseProblem[NTUJ 2061]{Halin Graph}{
       一個 Halin graph 就是一個畫在平面上的樹，然後把所有葉子用順時針依序連起來，
-      最後一個葉子在連到第一個葉子。 一個 $3$-regular graph 就是每個點的 degree
+      最後一個葉子再連到第一個葉子。 一個 $3$-regular graph 就是每個點的 degree
       都是 $3$。給你一個邊有權的 3-regular Halin Graph，求一個權值最大的 Hamiltonian
       graph $\cons{\abs{V} \leq 10^5, \abs{E} \leq 1.5 \cdot 10^5}$
     }
 
     \ExerciseProblem[PA 2012]{Tax}{
       給你一個圖 $G$ ，每個點上有權重 $c(v)$，你要從 $s$ 走到 $t$，每走一條邊 $(u, v)$
-      你就要付 $\max(c(u), c(v))$ 元，問你最小花費。 \cons{$\abs{V} \leq 1000, \abs{E} \leq 10^5$}
+      你就要付 $\max(c(u), c(v))$ 元，問你最小花費。 $\cons{\abs{V} \leq 1000, \abs{E} \leq 10^5}$
     }
 
     \ExerciseProblem[ASC 45 pF]{Flights}{
       給你一個圖，其中 $v_1$ 與所有其它點相鄰。你要給每個邊一個 $1, 2, \dots, \abs{E}$
       的數字，滿足令 $f(v)$ 表示所有與 $v$ 相鄰的邊的權重和，你要讓所有 $f(v)$ 都不同。
-      \cons{$\abs{V} \leq 10^5, \abs{E} \leq 2 \cdot 10^5$}
+      $\cons{\abs{V} \leq 10^5, \abs{E} \leq 2 \cdot 10^5}$
     }
 
     \ExerciseProblem{同色三色形}{
-      給你一個完全圖，圖的邊不是黑色就是白色，問你有幾個同色三角形。 \
+      給你一個完全圖，圖的邊不是黑色就是白色，問你有幾個同色三角形。 $\cons{\ord{\abs{V}^2}}$
     }
 
     \ExerciseProblem{競賽圖}{
@@ -767,98 +867,46 @@ $\tau(G)$，如果 $G = G_1 \cup G_2$，那 $\tau(G) = \tau_\cup(G_1, G_2)$，
       給你一個競賽圖，你要找一個 Hamiltonian path，使得假設這一個 path 為\\
       $v_1, v_2, \dots, v_n, n = \abs{V}$，對於所有 $i < j$，都存在一個
       長度不超過 $2$ 的路徑 $v_i \leadsto v_j$。
+      $\cons{\abs{V} \leq 10^5}$
     }
 
     \ExerciseProblem[NTUJ 2539]{Drawing Hell}{
-      給你一個平面圖，兩個人玩一個遊戲，輪流連一條邊，但邊不可以和已經再圖上的
+      給你一個平面圖，兩個人玩一個遊戲，輪流連一條邊，但邊不可以和已經在圖上的
       邊相交(只能在點上)。問先手還是後手贏。
+      $\cons{\abs{V} \leq 10^3}$
     }
 
-    \ExerciseProblem[TIOJ 1725]{Massacre at Camp Happy}{
-      定義兩個字串$A, B$是$k$-幾乎相同如果把 $A$ 的前 $k$ 個字元搬到最後面，那兩者恰相差一個字元，給你 $A, B$ ， 求出所有的 $k$ 使得他們是 $k$-幾乎相同。 $\cons{ \abs{A} = \abs{B} \leq 10^6 }$
+    \ExerciseProblem[ASC 41 pB]{Bicoloring of a tree}{
+      給你一棵樹，樹上有 $2n$ 個點，並且沒有一個點的度數超過 $n$。現在
+      你要用 $n+1$ 個顏色塗色，使得
+      \begin{itemize}
+        \item 兩個相鄰的點都不同色。
+        \item 一個顏色至多塗兩個點。
+        \item 用 $f(v)$ 表示點 $v$ 塗的顏色，不存在兩個邊 $(u_1, v_1), (u_2, v_2)$，
+          使得 $(f(u_1), f(v_1)) = (f(u_2), f(v_2))$ 或是
+          $(f(u_1), f(v_1)) = (f(v_2), f(u_2))$.
+      \end{itemize}
+      $\cons{\abs{2n} \leq 10^5}$
     }
 
-    \newcommand{\ZZ}{\operatorname{\mathcal{Z}}}
-    \ExerciseProblem[經典問題]{最長回文子字串}{
-      給一個字串 $A$ ，求出他最長的一個回文子字串。 $ \cons{ \ord{ \abs{A}} }$
-
-      這題可以用類似 Z-algorithm 的方法。我們先考慮如何求最長的{\bf 奇數}回文子字串。 令 $\ZZ(i)$表示以$i$為中心最長的回文字串為 $A[i-\ZZ(i), i+\ZZ(i)]$。 現在假設$(L, R) = (i-\ZZ(m), i+\ZZ(m))$, 即$A[L, R]$是一個以$a[m]$ 為中心的回文。如果 $j \in [m+1, R]$，考慮 $j' = 2m - j$，即$j$對$m$的反射點。現在與Z-algorithm類似，令 $L' = j - \ZZ(j')$，分別考慮 $L' > L, L' = L , L' < L$ 三種情況。
-
-      但此方法僅能求得奇數的回文長度。因此我們把原字串相鄰的兩個字元都插入一個不在字元集 $\Sigma$ 中的字元，如 $A = \str{abbab} \; \rightarrow A' = 
-  \str{a\$b\$b\$a\$b}$，這樣所有回文的長度都變成奇數了。
+    \ExerciseProblem[IOI 2007 Day 2]{Training}{
+      給你一個帶權的圖和他的一個生成樹，你要找一個權重和最小的邊集使得
+      原本的圖去掉這個邊集後沒有偶環。每個點的度數至多是 $10$。
+      $\cons{\abs{V} \leq 1000, \abs{E} \leq 5000}$
     }
 
-    \ExerciseProblem[Codeforces Zlobober's blog]{Anti-hash text}{
-      在 Hashing 實作上，因為 C++ 的模運算 \texttt{\%} 是非常花時間的，因此有一種 Lazy hash 的方法是 直接 $\bmod{2^{32}}$ 或是 $\bmod{2^{64}}$，這樣直接在 $\texttt{int}, \texttt{long long}$ 下做運算就可以了。但這樣做有其風險在，以下說明其原因。
-
-      不妨假設此 Hash function 為
-      \[ f(A) = \sum_{i=0}^{n-1} a_i p^{n-1-i} \bmod{q} \]
-      其中 $p$ 為一奇數(否則此 Hash function 無意義)，$q = 2^m$，並且 $\str{a}, \str{b}$ 轉換成數字後分別為 $\alpha, \alpha + 1$ 。此時令
-      \[ A_0 = \str{a}, \quad A_j = \widetilde{A}_{j-1} A_{j-1} \]
-      其中 $\widetilde{A}$ 表示把字串 $A$ 中的 $\str{a}$ 換成 $\str{b}$， $\str{b}$ 換成 $\str{a}$。如：
-      \[ A_1 = \str{ba}, \quad A_2 = \str{abba}, \quad A_3 = \str{baababba}, \quad \cdots \]
-      現在考慮 $A_{k}, \widetilde{A}_{k}$，注意這兩個字串恰好是 $A_{k+1}$ 的前後半且 $A_k \neq \widetilde{A}_{k}$。請證明
-      \begin{align*}
-        f(\widetilde{A}_{k}) - f(A_{k}) &= p^0 - p^1 - p^2 + p^3 -p^4 + p^5 + \cdots + (-1)^{k-1} p^{2^{k}-1} \\
-        &= \sum_{i=0}^{2^{k}-1} b_i p^i  \quad = S
-      \end{align*}
-      其中 $b_i \in \{ 1, -1 \}$，且如果 $i$ 的二進位表示有偶數個 $1$ ，則 $b_i = 1$，否則 $b_i = 0$。並且有
-      \[ \sum_{i=0}^{2^{k}-1} b_i p^i = (p-1)(p^2-1)(p^4-1) \cdots (p^{2^{k-1}} - 1) \]
-      注意到 $(p^{2^r} - 1)$ 可以被 $2^{r+1}$ 整除 (Why?) ，所以 $S$ 可以被 $2^{1 + 2 + \cdots + k} = 2^{k (k+1)/2}$整除。因此只要 $2^{k(k+1)/2}$ 被 $2^m$ 整除，也就是$\frac{k(k+1)}{2} > m$，$A_{k}$ 和 $\widetilde{A}_{k}$ 的 Hash value 就會相同。因此可以用一個長度為 $2^{\ord{x}}$ 的字串構造出一個使 $q = 2^{\ord{x^2}}$ 的 Hash function 失效的反例，並且與 $p$ 的選擇無關。
-    } 
-
-    \ExerciseProblem[經典問題]{二維匹配}{
-      給你一個 $R_A \times C_A$ 的二維字串 $A$ ， 問一個 $R_B \times C_B$ 的二維字串 $B$ 有沒有出現在其中？ $\cons{ \ord{ R_A C_A + R_B C_B }}$。
-
-      一個巧妙的做法可參考 Baker-Bird Algorithm，令外也有用 Hash 的方法，令$c = C_B, \; a_i[j] = f(A[i][j, j+c-1])$，原題等價於問 $f(B[0]), f(B[1]), \cdots f(B[R_B-1])$ 是不是等於\\ 
-      $a_i[j], a_{i+1}[j], \cdots , a_{i+R_B-1}[j]$。這是一個一維的匹配問題。詳細可參考去年的講義。
+    \ExerciseProblem[ACM ICPC Taipei regional pE]{怪圖怪題}{
+      給你一個圖，邊的距離都是 $1$，滿足所有的點雙連通元件都是完全圖。你要在裡面選
+      $k$ 個點，使得這 $k$ 個點連通，並且所有點到這個點集的距離和最少。
+      $\cons{\ord{kVE}}$
     }
 
-    \ExerciseProblem[ACM ICPC 2013-2014 NEERC Northern Subregional]{sed}{
-      給你$A, B$，求出字串 $X, Y$ 使得將 $A$ 中的 $X$ 取代為 $Y$ 後會變成 $B$，並且 $\abs{X} + \abs{Y}$ 最短。 取代的定義為找 $X$ 出現在 $A$ 的第一個位置，假設 $A[i, j] = X$ ，立刻將 $A[i, j]$ 變成 $Y$ ，並從 $j+1$ 繼續找下一個 $X$ 直到沒有為止。 $\cons{ \abs{A}, \abs{B} \leq 5000}$。
+    \ExerciseProblem[ASC pF]{Graph Factorization}{
+      給你一個有偶數個點的完全圖 $K_{2n}$，把他的邊分解成 $2n - 1$ 個集合，
+      使得每個點在一個集合裡都只與一個邊相鄰(也就是每個集合都是一個匹配)。
+      $\cons{n \leq 100}$
     }
 
-  \subsection{Suffix structure}
-    \ExerciseProblem[經典問題]{最小的後綴}{
-      給一個字串 $A$ ，求出他字典序最小的後綴。 $\cons{\ord{\abs{A}}}$
-
-      有不需要建出Suffix Array的方法。 \footnote{Hint: 雙指針}
-
-      這有一些應用，如最小循環表示法。 有時候我們會把一個狀態或物體用一個字串表示，並且可能旋轉需視為相同的，也就是把字串前 $k$ 個字元接到後面視為相同。 這時候如果要比較兩個字串，可以先求他們的最小循環表示在進行比較。
-    }
-
-    \ExerciseProblem[經典問題]{重複子字串}{
-      給一個字串 $A$ ，求出他最長的一個重複的子字串，重複的部分可以重疊。比如說 $A = \str{cabababc}$，最長的重複子字串為 $\str{aba}$。 $ \cons{ \ord{ \sa } }$ \footnote{ $\ord{ \sa }$ 表示建出後綴數組所需的時間。} \\
-      如果改成不能重複呢？ $\cons{ \ord{ \abs{A} \log \abs{A} } }$
-    }
-
-    \ExerciseProblem[經典問題]{連續重複的子字串}{
-      給一個字串 $A$ ，求出他的連續重複次數最多的子字串。比如說 $A = \str{cababababc}$， $\str{ab}$在子字串$\str{abababab}$中連續重複了$4$次。
-    } $\cons{ \ord{ \abs{A} \log \abs{A} } }$
-
-    \ExerciseProblem[ASC 40]{Binary Suffix Array}{
-      給定一個 $n$ 個整數的序列 $a_1, a_2, \cdots, a_n$， 找出一個01字串 $A$ 使得 $A$ 的後綴數組 $\sa$
-      恰好是給定的序列，注意到有可能無解。
-    } $\cons{ \abs{A} \leq 3 \cdot 10^5}$
-
-    \ExerciseProblem[SPOJ 7258]{Lexicographical Substring Search}{
-      給一個字串 $A$ ，現在把 $A$ 的所有子字串列出，將重複的刪去後排序。對於 $Q$ 比詢問， 輸出字典序第 $k$ 小的子字串。
-    } $\cons{ \abs{A} \leq 90000, Q \leq 500}$
-
-    \ExerciseProblem[NTUOJ 2200]{Beautiful Substring}{
-      給一個字串 $A$ ， 把他所有不同的子字串找出來，令這個集合為 $S$ ，接著每次會給一個字串 $B_i$， 假設他所有不同的子字串的集合為 $T_i$， 就令 $S \leftarrow S \setminus T_i$，並輸出此時的 $\abs{S}$，也就是 $S$ 裡還剩多少字串。
-    } $\cons{ \abs{A} \leq 2 \times 10^5,\; \sum \abs{B_i} \leq 10^6}$
-
-    \ExerciseProblem[ASC 42]{Incomparable Suffixes}{
-      給一個字串 $A$ ， 我們說兩個字串 $s, t$ 是{\bf 可分辨的} 若且為若存在一個字串 $z$ 使得 $sz, tz$ 中恰好只有一個是
-      $A$ 的後綴， 說兩個字串 $s, t$ 是 {\bf 無可比較的} 若且為若對所有 $s$ 的前綴 $x$ ， $t$ 的前綴 $y$ ， 
-      $x, y$ 都是可分辨的。 現在請找出 $a_1, a_2, \cdots, a_n$ 滿足：
-      \begin{enumerate}
-        \item 所有 $a_i$ 都是 $A$ 的後綴。
-        \item $n$ 越大越好。
-        \item 在 $n$ 是所有可能的最大值下， $\sum \abs{a_i}$ 越大越好。
-      \end{enumerate}
-    } $\cons{ \abs{A} \leq 10^5}$
   \section{Special Thanks}
   此分講義部分參考自去年及前年的講義，特別感謝以前的編輯者。
 \end{document}
